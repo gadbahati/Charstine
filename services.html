@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services — Charstine Eco-Tourist Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    body {
+      background:#000;
+      color:#f5e6d3;
+      font-family:'Crimson Text',serif;
+      overflow-wrap: break-word;
+      hyphens: auto;
+    }
+
+    h1,h2,h3 {
+      font-family:'Cinzel Decorative',cursive;
+    }
+
+    /* CLEAR, PROFESSIONAL GOLD */
+    .gold {
+      color: #E6C15A;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+
+    /* HIGH-CONTRAST CARDS */
+    .card {
+      background: #0B0B0B;
+      border: 3px solid #E6C15A;
+      padding: 2rem;
+      max-width: 100%;
+      overflow: hidden;
+      word-break: break-word;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.9);
+    }
+
+    .card h3 {
+      color: #FFD966;
+      letter-spacing: 1px;
+      text-shadow: none;
+    }
+
+    .card p {
+      color: #F2E8D8;
+    }
+
+    .card .text-9xl {
+      color: #FFD966;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.9);
+    }
+
+    .btn-gold {
+      background:linear-gradient(145deg,#FFD700,#B8975A);
+      box-shadow:0 15px 40px rgba(255,215,0,0.4);
+    }
+
+    /* Floating Live Chat Button */
+    .live-chat-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #25D366;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      color: white;
+    }
+
+    .live-chat-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(37, 211, 102, 0.6);
+    }
+
+    .live-chat-label {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: rgba(15, 15, 15, 0.9);
+      color: #f5e6d3;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(10px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .live-chat-btn:hover .live-chat-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      .live-chat-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 15px;
+        right: 15px;
+      }
+      .live-chat-label {
+        font-size: 12px;
+        padding: 6px 12px;
+        bottom: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="py-12 text-center border-b-8 border-double border-[#E6C15A]">
+  <h1 class="text-6xl md:text-9xl gold tracking-widest">SERVICES</h1>
+  <nav class="mt-8 flex justify-center gap-10 text-xl">
+    <a href="index.html" class="gold hover:text-[#FFD700]">Home</a>
+    <a href="services.html" class="text-[#FFD700]">Services</a>
+    <a href="gallery.html" class="gold hover:text-[#FFD700]">Gallery</a>
+    <a href="booking.html" class="gold hover:text-[#FFD700]">Reserve</a>
+  </nav>
+</header>
+
+<section class="py-20 px-6 max-w-7xl mx-auto">
+  <h2 class="text-center text-5xl md:text-7xl gold mb-16">A Proclamation of Unrivalled Excellence</h2>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-12">
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Crown</div>
+        <h3 class="text-4xl gold mb-8">Imperial Suites & Rooms</h3>
+        <p class="leading-relaxed text-lg italic">Our meticulously designed rooms and suites represent the pinnacle of corporate luxury accommodations, featuring hand-crafted four-poster beds in finest Belgian linen, 24-karat gold-leaf accents, and expansive marble balconies offering breathtaking views of Mount Elgon. Tailored for discerning business travelers and executives, these spaces provide a serene retreat with high-speed connectivity, ergonomic workspaces, and personalized valet service from Europe's premier hospitality institutions—ensuring productivity meets unparalleled comfort in a setting that's simply so cool and invigorating.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Goblet</div>
+        <h3 class="text-4xl gold mb-8">Aurum Bar & Restaurant</h3>
+        <p class="leading-relaxed text-lg italic">Elevate your corporate dining experience at our sophisticated bar and restaurant, where Michelin-mentored chefs curate symphonies of flavor using premium, locally sourced ingredients enhanced with edible 24-karat gold. From power lunches in sunlit terraces to after-hours networking at our fully stocked bar featuring rare spirits and craft cocktails, this venue fosters meaningful connections in an ambiance of refined elegance—making it so cool for sealing deals or unwinding with colleagues in style.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Lotus</div>
+        <h3 class="text-4xl gold mb-8">Private Lounge</h3>
+        <p class="leading-relaxed text-lg italic">Rejuvenate your executive team with our world-class facilities, blending liquid gold therapies and rare African botanicals in time-honored rituals performed by expert therapists. This sanctuary offers a respite from corporate demands, promoting wellness and peak performance—truly so cool for fostering innovation and work-life balance in a luxurious, eco-conscious environment.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Mountain</div>
+        <h3 class="text-4xl gold mb-8">The Elgon Conquest Adventures</h3>
+        <p class="leading-relaxed text-lg italic">Organize team-building expeditions with private sunrise ascents to Mount Elgon's hidden caves, crater lakes, and pristine trails, guided by seasoned experts. These bespoke adventures blend thrill and strategy, perfect for corporate retreats that build camaraderie—making it so cool to conquer challenges together in Kenya's breathtaking natural landscape.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Chandelier</div>
+        <h3 class="text-4xl gold mb-8">Grand Conference Halls & Meeting Rooms</h3>
+        <p class="leading-relaxed text-lg italic">Host high-stakes meetings and conferences in our state-of-the-art halls, featuring black marble walls veined with gold, advanced AV technology, and flexible seating for up to 500 delegates. Designed for corporate excellence, these spaces ensure seamless presentations and strategic discussions—so cool for driving business success in an inspiring, luxurious setting.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Ring</div>
+        <h3 class="text-4xl gold mb-8">Weddings & Special Events</h3>
+        <p class="leading-relaxed text-lg italic">Create unforgettable corporate or personal milestones with our bespoke wedding and event services, from intimate ceremonies under starlit skies to grand galas in opulent venues. Our dedicated planners handle every detail with precision and flair—making your occasion so cool and memorable in Charstine's enchanting surroundings.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Plate</div>
+        <h3 class="text-4xl gold mb-8">Premium Catering Services</h3>
+        <p class="leading-relaxed text-lg italic">Deliver exceptional corporate events with our full-spectrum catering, offering customized menus from gourmet hors d'oeuvres to multi-course feasts infused with local flavors and gold accents. Available on-site or off-premises, our service ensures flawless execution—so cool for impressing clients and elevating any business gathering.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Star</div>
+        <h3 class="text-4xl gold mb-8">Exclusive VIP Lounge</h3>
+        <p class="leading-relaxed text-lg italic">Access our elite VIP lounge, a private haven for executives featuring plush seating, premium beverages, and concierge assistance. Ideal for confidential discussions or relaxation between meetings—so cool for networking in an atmosphere of discreet luxury and sophistication.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Clean</div>
+        <h3 class="text-4xl gold mb-8">Professional Laundry Services</h3>
+        <p class="leading-relaxed text-lg italic">Maintain impeccable corporate appearance with our efficient, eco-friendly laundry and dry-cleaning services, using premium detergents and same-day turnaround for suits and attire. Discreet and reliable—so cool for busy professionals who demand perfection without compromise.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6">Key</div>
+        <h3 class="text-4xl gold mb-8">Les Clefs d’Or Concierge</h3>
+        <p class="leading-relaxed text-lg italic">Our Golden Key concierges anticipate every corporate need, from arranging private jets to curating bespoke experiences. Your vision becomes reality with seamless precision—so cool for transforming business travel into an extraordinary journey.</p>
+      </div>
+
+      <div class="card p-12 text-center transform hover:scale-105 transition duration-700">
+        <div class="text-9xl gold mb-6"><i class="fas fa-camera"></i></div>
+        <h3 class="text-4xl gold mb-8">Elite Photography & Videography</h3>
+        <p class="leading-relaxed text-lg italic">Capture the essence of your royal moments with our world-class photography and videography services, where award-winning artists wield state-of-the-art equipment to immortalize your corporate events, weddings, adventures, or personal milestones against the stunning backdrop of Mount Elgon. From cinematic drone footage soaring over golden sunsets to intimate portraits gilded with natural light and 24-karat elegance, our team crafts visual masterpieces that tell your story with breathtaking artistry—making it utterly worth giving it a shot to preserve memories that shine forever in unparalleled luxury and sophistication.</p>
+      </div>
+
+    </div>
+</section>
+
+<footer class="relative bg-black border-t-8 border-double border-[#E6C15A] py-16 mt-24">
+  <div class="absolute inset-0 opacity-20">
+    <div class="absolute inset-0 bg-gradient-to-t from-[#E6C15A] to-transparent"></div>
+  </div>
+  <div class="relative max-w-7xl mx-auto px-6 text-center">
+    <h2 class="text-5xl md:text-7xl font-black gold mb-8" style="font-family:'Cinzel Decorative',cursive;">CHARSTINE</h2>
+    <p class="text-xl tracking-widest text-amber-200 mb-10">Charstine Eco-Tourist Resort • Kamukuywa, Bungoma • Kenya</p>
+
+    <div class="flex flex-col md:flex-row justify-center gap-6 mb-12">
+      <a href="tel:+254791085514" class="inline-block px-12 py-6 btn-gold text-black font-bold text-xl tracking-widest hover:shadow-2xl transform hover:scale-105 transition">CALL US TODAY</a>
+      <a href="https://wa.me/254118298056" class="inline-block px-12 py-6 btn-gold text-black font-bold text-xl tracking-widest hover:shadow-2xl transform hover:scale-105 transition">WHATSAPP US</a>
+    </div>
+
+    <div class="flex justify-center gap-8 mb-10 flex-wrap text-4xl">
+      <a href="https://facebook.com/charstine" class="gold hover:text-[#FFD700] transform hover:scale-125 transition" aria-label="Facebook">Facebook</a>
+      <a href="https://instagram.com/charstine" class="gold hover:text-[#FFD700] transform hover:scale-125 transition" aria-label="Instagram">Instagram</a>
+      <a href="https://wa.me/254118298056" class="gold hover:text-[#FFD700] transform hover:scale-125 transition" aria-label="WhatsApp">WhatsApp</a>
+      <a href="https://x.com/charstine" class="gold hover:text-[#FFD700] transform hover:scale-125 transition" aria-label="X">X</a>
+      <a href="https://tiktok.com/@charstine" class="gold hover:text-[#FFD700] transform hover:scale-125 transition" aria-label="TikTok">TikTok</a>
+      <a href="https://youtube.com/@charstine" class="gold hover:text-[#FFD700] transform hover:scale-125 transition" aria-label="YouTube">YouTube</a>
+    </div>
+
+    <div class="text-amber-100 space-y-3 text-lg">
+      <p>Telephone & WhatsApp: <span class="gold font-bold">254118298056</span></p>
+      <p>Correspondence: <span class="gold font-bold">crown@charstine.co.ke</span></p>
+    </div>
+
+    <p class="mt-12 text-amber-300 tracking-widest text-sm">© 2025 Charstine Eco-Tourist Resort — All Rights Reserved<br><span class="text-amber-400">Where Even the Sun Rises in Gold</span></p>
+  </div>
+</footer>
+
+<a href="https://wa.me/254118298056?text=Hello%2C%20I%20would%20like%20to%20make%20an%20enquiry." target="_blank" class="live-chat-btn">
+  <i class="fab fa-whatsapp text-3xl"></i>
+  <span class="live-chat-label">Live Chat</span>
+</a>
+
+</body>
+</html>
