@@ -25,6 +25,13 @@ CREATE TABLE IF NOT EXISTS rentals (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS admin_sessions (
+  id TEXT PRIMARY KEY,
+  admin_id INTEGER NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at TIMESTAMPTZ NOT NULL
+);
+
 INSERT INTO admin_users (id, email, password_hash)
 VALUES (
   1,

@@ -68,6 +68,7 @@ node server.js
 ## Deployment Notes (Vercel / Railway / Heroku)
 
 - Ensure `DATABASE_URL` and `SESSION_SECRET` are set in your hosting environment.
+- On Vercel, admin APIs are served from `/api/*` serverless routes. The admin pages auto-detect production and call these API routes.
 - For production, keep `NODE_ENV=production` so cookies are secure.
 - You can start with `node server.js` or `npm start`.
 
