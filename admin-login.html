@@ -82,10 +82,10 @@
           body: JSON.stringify(payload),
         });
 
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
 
         if (!response.ok) {
-          message.textContent = data.error || 'Login failed.';
+          message.textContent = data.error || `Login failed (HTTP ${response.status}).`;
           message.classList.add('text-red-400');
           return;
         }
@@ -94,7 +94,7 @@
         message.classList.add('text-green-400');
         window.location.href = '/admin-dashboard.html';
       } catch (_error) {
-        message.textContent = 'Server connection error. Try again.';
+        message.textContent = 'Server connection error. Check internet/Vercel deployment and try again.';
         message.classList.add('text-red-400');
       }
     });

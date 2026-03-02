@@ -5,10 +5,6 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'Charstinehoteltourist@gmail.com').toLowerCase();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Resort254';
 
-if (!DATABASE_URL) {
-  throw new Error('DATABASE_URL is required for Vercel API functions.');
-}
-
 const pool = new Pool({
   connectionString: DATABASE_URL,
   ssl: { rejectUnauthorized: false },
@@ -20,6 +16,10 @@ async function initDb() {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
+    if (!DATABASE_URL) {
+      throw new Error('DATABASE_URL is not configured.');
+    }
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS admin_users (
         id SERIAL PRIMARY KEY,
