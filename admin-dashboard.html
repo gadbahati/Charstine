@@ -146,14 +146,18 @@
 
   <footer class="border-t border-amber-300/20 bg-slate-900/75 px-4 py-6">
     <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 text-center text-sm text-slate-300 md:flex-row md:text-left">
-      <p>Â© 2026 Charstine Eco-Tourist Resort. Admin System.</p>
+      <p>© 2026 Charstine Eco-Tourist Resort. Admin System.</p>
       <p>Call/WhatsApp: <span class="font-semibold text-amber-300">0790139460</span></p>
       <p>Email: <span class="font-semibold text-amber-300">Charstinehoteltourist@gmail.com</span></p>
     </div>
   </footer>
 
   <script>
-    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '/api';
+    const ADMIN_EMAIL = 'charstinehoteltourist@gmail.com';
+    const AUTH_KEY = 'charstine_admin_auth';
+    const INVENTORY_KEY = 'charstine_inventory';
+    const RENTALS_KEY = 'charstine_rentals';
+
     const statusEl = document.getElementById('status');
     const adminEmailEl = document.getElementById('adminEmail');
     const inventoryTable = document.getElementById('inventoryTable');
@@ -172,40 +176,83 @@
     const dailyReports = document.getElementById('dailyReports');
     const weeklyReports = document.getElementById('weeklyReports');
 
+    const defaultInventory = [
+      { id: 1, name: 'Dining Table', category: 'Restaurant', quantity: 10, description: 'Wooden tables for dining' },
+      { id: 2, name: 'Chair Set', category: 'Restaurant', quantity: 20, description: 'Comfortable dining chairs' },
+      { id: 3, name: 'Tent', category: 'Hall', quantity: 5, description: 'Large event tents' },
+      { id: 4, name: 'Projector', category: 'ICT', quantity: 3, description: 'Hall projector' },
+      { id: 5, name: 'Laptop', category: 'ICT', quantity: 8, description: 'Admin laptops' },
+      { id: 6, name: 'Bed', category: 'Beds', quantity: 20, description: 'King-size beds' },
+      { id: 7, name: 'Plate Set', category: 'Utensils', quantity: 50, description: 'Dinner plate set' },
+      { id: 8, name: 'Spoon Set', category: 'Utensils', quantity: 100, description: 'Stainless steel spoons' },
+      { id: 9, name: 'Cleaning Cart', category: 'Store', quantity: 5, description: 'Storage and housekeeping cart' },
+      { id: 10, name: 'Speaker System', category: 'Hall', quantity: 2, description: 'For hall events' },
+    ];
+
     let inventory = [];
+    let rentals = [];
+
+    function getAuth() {
+      const raw = localStorage.getItem(AUTH_KEY);
+      if (!raw) return null;
+      try {
+        return JSON.parse(raw);
+      } catch (_error) {
+        return null;
+      }
+    }
+
+    function ensureAuth() {
+      const auth = getAuth();
+      if (!auth || auth.email !== ADMIN_EMAIL) {
+        window.location.href = '/admin-login.html';
+        return false;
+      }
+      adminEmailEl.textContent = `Logged in as: ${auth.email}`;
+      return true;
+    }
 
     function setStatus(message, ok = true) {
       statusEl.textContent = message;
       statusEl.className = `rounded-lg border p-3 text-sm lg:col-span-2 ${ok ? 'border-emerald-700 bg-emerald-950 text-emerald-200' : 'border-red-700 bg-red-950 text-red-200'}`;
     }
 
-    async function api(path, options = {}) {
-      const response = await fetch(`${API_BASE}${path}`, {
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-        ...options,
-      });
+    function loadLocalState() {
+      const rawInventory = localStorage.getItem(INVENTORY_KEY);
+      const rawRentals = localStorage.getItem(RENTALS_KEY);
 
-      if (response.status === 401) {
-        window.location.href = '/admin-login.html';
-        throw new Error('Unauthorized');
+      if (!rawInventory) {
+        inventory = [...defaultInventory];
+        localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+      } else {
+        try {
+          inventory = JSON.parse(rawInventory) || [];
+        } catch (_error) {
+          inventory = [...defaultInventory];
+        }
       }
 
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.error || 'Request failed');
+      if (!rawRentals) {
+        rentals = [];
+        localStorage.setItem(RENTALS_KEY, JSON.stringify(rentals));
+      } else {
+        try {
+          rentals = JSON.parse(rawRentals) || [];
+        } catch (_error) {
+          rentals = [];
+        }
       }
-      return data;
     }
 
-    async function checkSession() {
-      const session = await api('/admin-session');
-      adminEmailEl.textContent = `Logged in as: ${session.email}`;
+    function persistState() {
+      localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+      localStorage.setItem(RENTALS_KEY, JSON.stringify(rentals));
     }
 
     function renderInventory() {
       if (inventory.length === 0) {
         inventoryTable.innerHTML = '<tr><td colspan="6" class="py-4 text-slate-400">No inventory items found.</td></tr>';
+        rentalItemSelect.innerHTML = '';
         return;
       }
 
@@ -223,9 +270,73 @@
         </tr>
       `).join('');
 
-      rentalItemSelect.innerHTML = inventory.map((item) =>
-        `<option value="${item.id}">${item.name} (${item.quantity} available)</option>`
-      ).join('');
+      rentalItemSelect.innerHTML = inventory
+        .filter((item) => item.quantity > 0)
+        .map((item) => `<option value="${item.id}">${item.name} (${item.quantity} available)</option>`)
+        .join('');
+    }
+
+    function renderRentals() {
+      if (rentals.length === 0) {
+        rentalTable.innerHTML = '<tr><td colspan="7" class="py-4 text-slate-400">No rentals logged yet.</td></tr>';
+        return;
+      }
+
+      const sortedRentals = [...rentals].sort((a, b) => new Date(b.hire_date) - new Date(a.hire_date) || b.id - a.id);
+      rentalTable.innerHTML = sortedRentals.map((rental) => {
+        const item = inventory.find((x) => x.id === rental.item_id);
+        return `
+          <tr class="border-b border-slate-800">
+            <td class="py-2 pr-2">${rental.id}</td>
+            <td class="py-2 pr-2">${item ? item.name : 'Deleted Item'}</td>
+            <td class="py-2 pr-2">${rental.quantity}</td>
+            <td class="py-2 pr-2">${rental.renter_name || '-'}</td>
+            <td class="py-2 pr-2">${rental.hire_date}</td>
+            <td class="py-2 pr-2">${rental.return_date}</td>
+            <td class="py-2 pr-2">${Number(rental.price).toFixed(2)}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function startOfWeek(dateStr) {
+      const date = new Date(dateStr);
+      const day = date.getUTCDay();
+      const diff = (day + 6) % 7;
+      date.setUTCDate(date.getUTCDate() - diff);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function renderReports() {
+      const dailyMap = new Map();
+      const weeklyMap = new Map();
+
+      rentals.forEach((rental) => {
+        const day = rental.hire_date;
+        const week = startOfWeek(rental.hire_date);
+        const price = Number(rental.price) || 0;
+
+        const daily = dailyMap.get(day) || { rentals_count: 0, total_revenue: 0 };
+        daily.rentals_count += 1;
+        daily.total_revenue += price;
+        dailyMap.set(day, daily);
+
+        const weekly = weeklyMap.get(week) || { rentals_count: 0, total_revenue: 0 };
+        weekly.rentals_count += 1;
+        weekly.total_revenue += price;
+        weeklyMap.set(week, weekly);
+      });
+
+      const dailyRows = [...dailyMap.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, 7);
+      const weeklyRows = [...weeklyMap.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, 8);
+
+      dailyReports.innerHTML = dailyRows.length
+        ? dailyRows.map(([period, row]) => `<li class="rounded border border-slate-800 bg-slate-950 px-3 py-2">${period}: ${row.rentals_count} rentals, ${row.total_revenue.toFixed(2)} revenue</li>`).join('')
+        : '<li class="text-slate-400">No daily report data.</li>';
+
+      weeklyReports.innerHTML = weeklyRows.length
+        ? weeklyRows.map(([period, row]) => `<li class="rounded border border-slate-800 bg-slate-950 px-3 py-2">Week of ${period}: ${row.rentals_count} rentals, ${row.total_revenue.toFixed(2)} revenue</li>`).join('')
+        : '<li class="text-slate-400">No weekly report data.</li>';
     }
 
     function resetItemForm() {
@@ -237,43 +348,13 @@
       itemFormTitle.textContent = 'Add Item';
     }
 
-    async function loadInventory() {
-      inventory = await api('/inventory');
+    function refreshAllViews() {
       renderInventory();
+      renderRentals();
+      renderReports();
     }
 
-    async function loadRentals() {
-      const rentals = await api('/rentals');
-      if (rentals.length === 0) {
-        rentalTable.innerHTML = '<tr><td colspan="7" class="py-4 text-slate-400">No rentals logged yet.</td></tr>';
-        return;
-      }
-
-      rentalTable.innerHTML = rentals.map((rental) => `
-        <tr class="border-b border-slate-800">
-          <td class="py-2 pr-2">${rental.id}</td>
-          <td class="py-2 pr-2">${rental.item_name}</td>
-          <td class="py-2 pr-2">${rental.quantity}</td>
-          <td class="py-2 pr-2">${rental.renter_name || '-'}</td>
-          <td class="py-2 pr-2">${String(rental.hire_date).slice(0, 10)}</td>
-          <td class="py-2 pr-2">${String(rental.return_date).slice(0, 10)}</td>
-          <td class="py-2 pr-2">${Number(rental.price).toFixed(2)}</td>
-        </tr>
-      `).join('');
-    }
-
-    async function loadReports() {
-      const reports = await api('/reports');
-      dailyReports.innerHTML = reports.daily.length
-        ? reports.daily.map((entry) => `<li class="rounded border border-slate-800 bg-slate-950 px-3 py-2">${String(entry.period).slice(0, 10)}: ${entry.rentals_count} rentals, ${Number(entry.total_revenue).toFixed(2)} revenue</li>`).join('')
-        : '<li class="text-slate-400">No daily report data.</li>';
-
-      weeklyReports.innerHTML = reports.weekly.length
-        ? reports.weekly.map((entry) => `<li class="rounded border border-slate-800 bg-slate-950 px-3 py-2">Week of ${String(entry.period).slice(0, 10)}: ${entry.rentals_count} rentals, ${Number(entry.total_revenue).toFixed(2)} revenue</li>`).join('')
-        : '<li class="text-slate-400">No weekly report data.</li>';
-    }
-
-    itemForm.addEventListener('submit', async (event) => {
+    itemForm.addEventListener('submit', (event) => {
       event.preventDefault();
       try {
         const payload = {
@@ -287,14 +368,24 @@
           throw new Error('Please provide valid item details.');
         }
 
-        const isEdit = Boolean(itemId.value);
-        const path = isEdit ? `/inventory/${itemId.value}` : '/inventory';
-        const method = isEdit ? 'PUT' : 'POST';
+        if (itemId.value) {
+          const editId = Number(itemId.value);
+          const target = inventory.find((item) => item.id === editId);
+          if (!target) throw new Error('Item not found.');
+          target.name = payload.name;
+          target.category = payload.category;
+          target.quantity = payload.quantity;
+          target.description = payload.description;
+          setStatus('Item updated successfully.');
+        } else {
+          const nextId = inventory.reduce((max, item) => Math.max(max, item.id), 0) + 1;
+          inventory.push({ id: nextId, ...payload });
+          setStatus('Item added successfully.');
+        }
 
-        await api(path, { method, body: JSON.stringify(payload) });
+        persistState();
         resetItemForm();
-        await loadInventory();
-        setStatus(isEdit ? 'Item updated successfully.' : 'Item added successfully.');
+        refreshAllViews();
       } catch (error) {
         setStatus(error.message, false);
       }
@@ -302,7 +393,7 @@
 
     document.getElementById('cancelEdit').addEventListener('click', resetItemForm);
 
-    inventoryTable.addEventListener('click', async (event) => {
+    inventoryTable.addEventListener('click', (event) => {
       const button = event.target.closest('button');
       if (!button) return;
 
@@ -323,17 +414,14 @@
 
       if (action === 'delete') {
         if (!window.confirm(`Delete "${selectedItem.name}"?`)) return;
-        try {
-          await api(`/inventory/${selectedItem.id}`, { method: 'DELETE' });
-          await loadInventory();
-          setStatus('Item deleted successfully.');
-        } catch (error) {
-          setStatus(error.message, false);
-        }
+        inventory = inventory.filter((item) => item.id !== selectedItem.id);
+        persistState();
+        refreshAllViews();
+        setStatus('Item deleted successfully.');
       }
     });
 
-    rentalForm.addEventListener('submit', async (event) => {
+    rentalForm.addEventListener('submit', (event) => {
       event.preventDefault();
       try {
         const payload = {
@@ -351,43 +439,47 @@
         if (payload.return_date < payload.hire_date) throw new Error('Return date cannot be before hire date.');
         if (Number.isNaN(payload.price) || payload.price < 0) throw new Error('Price must be a valid positive number.');
 
-        await api('/rentals', { method: 'POST', body: JSON.stringify(payload) });
+        const item = inventory.find((x) => x.id === payload.item_id);
+        if (!item) throw new Error('Selected item no longer exists.');
+        if (item.quantity < payload.quantity) throw new Error(`Insufficient stock. Available quantity: ${item.quantity}.`);
+
+        item.quantity -= payload.quantity;
+        const nextRentalId = rentals.reduce((max, rental) => Math.max(max, rental.id), 0) + 1;
+        rentals.push({
+          id: nextRentalId,
+          ...payload,
+        });
+
+        persistState();
         rentalForm.reset();
-        await Promise.all([loadInventory(), loadRentals(), loadReports()]);
+        refreshAllViews();
         setStatus('Rental logged successfully and inventory updated.');
       } catch (error) {
         setStatus(error.message, false);
       }
     });
 
-    document.getElementById('refreshInventory').addEventListener('click', async () => {
-      try {
-        await Promise.all([loadInventory(), loadRentals(), loadReports()]);
-        setStatus('Dashboard data refreshed.');
-      } catch (error) {
-        setStatus(error.message, false);
-      }
+    document.getElementById('refreshInventory').addEventListener('click', () => {
+      loadLocalState();
+      refreshAllViews();
+      setStatus('Dashboard data refreshed.');
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      try {
-        await fetch(`${API_BASE}/logout`, { credentials: 'include' });
-      } catch (_error) {}
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem(AUTH_KEY);
       window.location.href = '/index.html';
     });
 
-    async function init() {
-      try {
-        await checkSession();
-        await Promise.all([loadInventory(), loadRentals(), loadReports()]);
-        setStatus('Dashboard ready.');
-      } catch (error) {
-        setStatus(error.message || 'Failed to load dashboard.', false);
-      }
+    function init() {
+      if (!ensureAuth()) return;
+      loadLocalState();
+      refreshAllViews();
+      setStatus('Dashboard ready.');
     }
 
     init();
   </script>
 </body>
 </html>
+
 

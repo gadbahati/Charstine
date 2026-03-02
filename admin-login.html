@@ -41,66 +41,69 @@
   </main>
 
   <footer class="border-t border-amber-300/20 bg-slate-900/75 px-4 py-4 text-center text-xs text-slate-300">
-    Â© 2026 Charstine Eco-Tourist Resort | Call/WhatsApp: 0790139460 | Charstinehoteltourist@gmail.com
+    © 2026 Charstine Eco-Tourist Resort | Call/WhatsApp: 0790139460 | Charstinehoteltourist@gmail.com
   </footer>
 
   <script>
+    const ADMIN_EMAIL = 'charstinehoteltourist@gmail.com';
+    const ADMIN_PASSWORD = 'Resort254';
+    const AUTH_KEY = 'charstine_admin_auth';
+
     const form = document.getElementById('loginForm');
     const message = document.getElementById('message');
-    const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? '' : '/api';
 
-    async function checkSession() {
+    function isLoggedIn() {
+      const raw = localStorage.getItem(AUTH_KEY);
+      if (!raw) return false;
       try {
-        const response = await fetch(`${API_BASE}/admin-session`, { credentials: 'include' });
-        if (response.ok) {
-          window.location.href = '/admin-dashboard.html';
-        }
-      } catch (_error) {}
+        const parsed = JSON.parse(raw);
+        return parsed && parsed.email === ADMIN_EMAIL;
+      } catch (_error) {
+        return false;
+      }
     }
 
-    form.addEventListener('submit', async (event) => {
+    function setLogin() {
+      localStorage.setItem(
+        AUTH_KEY,
+        JSON.stringify({
+          email: ADMIN_EMAIL,
+          loginAt: new Date().toISOString(),
+        })
+      );
+    }
+
+    if (isLoggedIn()) {
+      window.location.href = '/admin-dashboard.html';
+    }
+
+    form.addEventListener('submit', (event) => {
       event.preventDefault();
       message.textContent = '';
       message.className = 'mt-4 text-sm';
 
-      const payload = {
-        email: form.email.value.trim(),
-        password: form.password.value,
-      };
+      const email = String(form.email.value || '').trim().toLowerCase();
+      const password = String(form.password.value || '');
 
-      if (!payload.email || !payload.password) {
+      if (!email || !password) {
         message.textContent = 'Please enter both email and password.';
         message.classList.add('text-red-400');
         return;
       }
 
-      try {
-        const response = await fetch(`${API_BASE}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          message.textContent = data.error || `Login failed (HTTP ${response.status}).`;
-          message.classList.add('text-red-400');
-          return;
-        }
-
+      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        setLogin();
         message.textContent = 'Login successful. Redirecting...';
         message.classList.add('text-green-400');
         window.location.href = '/admin-dashboard.html';
-      } catch (_error) {
-        message.textContent = 'Server connection error. Check internet/Vercel deployment and try again.';
-        message.classList.add('text-red-400');
+        return;
       }
-    });
 
-    checkSession();
+      message.textContent = 'Invalid email or password.';
+      message.classList.add('text-red-400');
+    });
   </script>
 </body>
 </html>
+
 
