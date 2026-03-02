@@ -1,0 +1,16 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "rewrites": [
+    { "source": "/login", "destination": "/api/login" },
+    { "source": "/logout", "destination": "/api/logout" },
+    { "source": "/admin-session", "destination": "/api/admin-session" },
+    { "source": "/inventory", "destination": "/api/inventory" },
+    { "source": "/inventory/:id", "destination": "/api/inventory/:id" },
+    { "source": "/rentals", "destination": "/api/rentals" },
+    { "source": "/reports", "destination": "/api/reports" }
+  ]
+}
