@@ -5,10 +5,31 @@ const DATABASE_URL = process.env.DATABASE_URL;
 const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'Charstinehoteltourist@gmail.com').toLowerCase();
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Resort254';
 
-const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
-});
+let _pool;
+
+function isLocalDatabaseUrl(url) {
+  return /localhost|127\.0\.0\.1/i.test(url || '');
+}
+
+function getPool() {
+  if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL is not configured.');
+  }
+
+  if (!_pool) {
+    _pool = new Pool({
+      connectionString: DATABASE_URL,
+      ssl: isLocalDatabaseUrl(DATABASE_URL) ? false : { rejectUnauthorized: false },
+    });
+  }
+
+  return _pool;
+}
+
+const pool = {
+  query: (...args) => getPool().query(...args),
+  connect: (...args) => getPool().connect(...args),
+};
 
 let initPromise;
 
@@ -16,10 +37,6 @@ async function initDb() {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
-    if (!DATABASE_URL) {
-      throw new Error('DATABASE_URL is not configured.');
-    }
-
     await pool.query(`
       CREATE TABLE IF NOT EXISTS admin_users (
         id SERIAL PRIMARY KEY,

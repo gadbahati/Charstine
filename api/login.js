@@ -68,6 +68,9 @@ module.exports = async (req, res) => {
     return res.status(200).json({ success: true });
   } catch (error) {
     console.error('login error', error);
+    if (String(error.message || '').includes('DATABASE_URL is not configured')) {
+      return res.status(500).json({ error: 'DATABASE_URL is missing in Vercel environment variables.' });
+    }
     return res.status(500).json({ error: 'Server error during login.' });
   }
 };
