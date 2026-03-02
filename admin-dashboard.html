@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -146,7 +146,7 @@
 
   <footer class="border-t border-amber-300/20 bg-slate-900/75 px-4 py-6">
     <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 text-center text-sm text-slate-300 md:flex-row md:text-left">
-      <p>� 2026 Charstine Eco-Tourist Resort. Admin System.</p>
+      <p>© 2026 Charstine Eco-Tourist Resort. Admin System.</p>
       <p>Call/WhatsApp: <span class="font-semibold text-amber-300">0790139460</span></p>
       <p>Email: <span class="font-semibold text-amber-300">Charstinehoteltourist@gmail.com</span></p>
     </div>
@@ -154,7 +154,7 @@
 
   <script>
     const ADMIN_EMAIL = 'charstinehoteltourist@gmail.com';
-    const AUTH_KEY = 'charstine_admin_auth';
+    const AUTH_KEY = 'charstine_admin_ok';
     const INVENTORY_KEY = 'charstine_inventory';
     const RENTALS_KEY = 'charstine_rentals';
 
@@ -192,23 +192,22 @@
     let inventory = [];
     let rentals = [];
 
-    function getAuth() {
-      const raw = localStorage.getItem(AUTH_KEY);
-      if (!raw) return null;
-      try {
-        return JSON.parse(raw);
-      } catch (_error) {
-        return null;
-      }
+    function hasCookie(name) {
+      return document.cookie.split(';').some((row) => row.trim().startsWith(`${name}=`));
     }
 
     function ensureAuth() {
-      const auth = getAuth();
-      if (!auth || auth.email !== ADMIN_EMAIL) {
-        window.location.href = '/admin-access.html';
+      let ok = false;
+      try { if (localStorage.getItem(AUTH_KEY) === '1') ok = true; } catch (_error) {}
+      try { if (sessionStorage.getItem(AUTH_KEY) === '1') ok = true; } catch (_error) {}
+      if (hasCookie(AUTH_KEY)) ok = true;
+
+      if (!ok) {
+        window.location.replace('/admin-access.html');
         return false;
       }
-      adminEmailEl.textContent = `Logged in as: ${auth.email}`;
+
+      adminEmailEl.textContent = `Logged in as: ${ADMIN_EMAIL}`;
       return true;
     }
 
@@ -466,8 +465,10 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem(AUTH_KEY);
-      window.location.href = '/index.html';
+      try { localStorage.removeItem(AUTH_KEY); } catch (_error) {}
+      try { sessionStorage.removeItem(AUTH_KEY); } catch (_error) {}
+      document.cookie = `${AUTH_KEY}=; Path=/; Max-Age=0; SameSite=Lax`;
+      window.location.replace('/index.html');
     });
 
     function init() {
@@ -481,6 +482,7 @@
   </script>
 </body>
 </html>
+
 
 
 
