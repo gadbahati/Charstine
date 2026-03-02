@@ -153,8 +153,8 @@
   </footer>
 
   <script>
-    const ADMIN_EMAIL = 'charstinehoteltourist@gmail.com';
     const AUTH_KEY = 'charstine_admin_ok';
+    const AUTH_EMAIL_KEY = 'charstine_admin_email';
     const INVENTORY_KEY = 'charstine_inventory';
     const RENTALS_KEY = 'charstine_rentals';
 
@@ -198,17 +198,18 @@
 
     function ensureAuth() {
       let ok = false;
+      let email = 'Website Owner';
       try { if (localStorage.getItem(AUTH_KEY) === '1') ok = true; } catch (_error) {}
       try { if (sessionStorage.getItem(AUTH_KEY) === '1') ok = true; } catch (_error) {}
       if (hasCookie(AUTH_KEY)) ok = true;
 
-      if (!ok) {
-        window.location.replace('/admin-access.html');
-        return false;
-      }
+      try { email = localStorage.getItem(AUTH_EMAIL_KEY) || email; } catch (_error) {}
+      try { email = sessionStorage.getItem(AUTH_EMAIL_KEY) || email; } catch (_error) {}
 
-      adminEmailEl.textContent = `Logged in as: ${ADMIN_EMAIL}`;
-      return true;
+      adminEmailEl.textContent = ok
+        ? `Logged in as: ${email}`
+        : 'Open dashboard mode';
+      return ok;
     }
 
     function setStatus(message, ok = true) {
@@ -466,13 +467,15 @@
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       try { localStorage.removeItem(AUTH_KEY); } catch (_error) {}
+      try { localStorage.removeItem(AUTH_EMAIL_KEY); } catch (_error) {}
       try { sessionStorage.removeItem(AUTH_KEY); } catch (_error) {}
+      try { sessionStorage.removeItem(AUTH_EMAIL_KEY); } catch (_error) {}
       document.cookie = `${AUTH_KEY}=; Path=/; Max-Age=0; SameSite=Lax`;
       window.location.replace('/index.html');
     });
 
     function init() {
-      if (!ensureAuth()) return;
+      ensureAuth();
       loadLocalState();
       refreshAllViews();
       setStatus('Dashboard ready.');

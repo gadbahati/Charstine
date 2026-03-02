@@ -45,9 +45,8 @@
   </footer>
 
   <script>
-    const ADMIN_EMAIL = 'charstinehoteltourist@gmail.com';
-    const ADMIN_PASSWORD = 'Resort254';
     const AUTH_KEY = 'charstine_admin_ok';
+    const AUTH_EMAIL_KEY = 'charstine_admin_email';
 
     const form = document.getElementById('loginForm');
     const message = document.getElementById('message');
@@ -66,9 +65,11 @@
       return hasCookie(AUTH_KEY);
     }
 
-    function setLogin() {
+    function setLogin(email) {
       try { localStorage.setItem(AUTH_KEY, '1'); } catch (_error) {}
+      try { localStorage.setItem(AUTH_EMAIL_KEY, email); } catch (_error) {}
       try { sessionStorage.setItem(AUTH_KEY, '1'); } catch (_error) {}
+      try { sessionStorage.setItem(AUTH_EMAIL_KEY, email); } catch (_error) {}
       document.cookie = `${AUTH_KEY}=1; Path=/; Max-Age=28800; SameSite=Lax`;
     }
 
@@ -90,15 +91,16 @@
         return;
       }
 
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        setLogin();
+      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (validEmail && password.length > 0) {
+        setLogin(email);
         message.textContent = 'Login successful. Redirecting...';
         message.classList.add('text-green-400');
         window.location.replace('/admin-dashboard.html');
         return;
       }
 
-      message.textContent = 'Invalid email or password.';
+      message.textContent = 'Please enter a valid email and password.';
       message.classList.add('text-red-400');
     });
   </script>
