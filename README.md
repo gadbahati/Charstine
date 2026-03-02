@@ -23,7 +23,7 @@ This repository now includes a secure admin-only inventory and rental management
 ## Files Added/Updated
 
 - `index.html` (updated with Admin link)
-- `admin-login.html`
+- `admin-access.html`
 - `admin-dashboard.html`
 - `server.js`
 - `schema.sql`
@@ -63,7 +63,7 @@ node server.js
 6. Open:
 
 - Public site: `http://localhost:3000/index.html`
-- Admin login: `http://localhost:3000/admin-login.html`
+- Admin login: `http://localhost:3000/admin-access.html`
 
 ## Deployment Notes (Vercel / Railway / Heroku)
 

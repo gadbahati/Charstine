@@ -151,7 +151,7 @@ app.post('/login', loginLimiter, async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     console.error('Login error:', error);
-    return res.status(500).json({ error: 'Server error during login.' });
+    return res.status(500).json({ error: 'Login failed.' });
   }
 });
 
@@ -389,7 +389,7 @@ app.get('/reports', requireAdmin, async (_req, res) => {
 
 app.get('/admin-dashboard.html', (req, res) => {
   if (!req.session || !req.session.isAdmin) {
-    return res.redirect('/admin-login.html');
+    return res.redirect('/admin-access.html');
   }
   return res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
 });
@@ -398,7 +398,7 @@ app.get('/admin-login.html', (req, res) => {
   if (req.session && req.session.isAdmin) {
     return res.redirect('/admin-dashboard.html');
   }
-  return res.sendFile(path.join(__dirname, 'admin-login.html'));
+  return res.sendFile(path.join(__dirname, 'admin-access.html'));
 });
 
 app.use(express.static(path.join(__dirname)));
