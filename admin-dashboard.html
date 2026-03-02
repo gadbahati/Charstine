@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | Charstine Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background:
+        radial-gradient(circle at 12% 10%, rgba(251, 191, 36, 0.14) 0, transparent 32%),
+        radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.14) 0, transparent 36%),
+        radial-gradient(circle at 84% 82%, rgba(14, 165, 233, 0.12) 0, transparent 38%),
+        #020617;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-100">
+  <header class="border-b border-amber-400/30 bg-slate-900/85 backdrop-blur">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4">
+      <div class="min-w-0">
+        <h1 class="text-2xl font-bold text-amber-300">Admin Inventory & Rentals</h1>
+        <p id="adminEmail" class="truncate text-sm text-slate-300"></p>
+      </div>
+      <button id="logoutBtn" class="rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-400">Logout</button>
+    </div>
+  </header>
+
+  <main class="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 lg:grid-cols-2">
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-5 shadow-xl shadow-black/20 lg:col-span-2">
+      <div class="flex items-center justify-between gap-3">
+        <h2 class="text-xl font-semibold text-amber-300">Inventory</h2>
+        <button id="refreshInventory" class="rounded-lg bg-slate-700 px-3 py-2 text-sm transition hover:bg-slate-600">Refresh</button>
+      </div>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full min-w-[700px] border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-slate-700 text-left text-slate-300">
+              <th class="py-2 pr-2">ID</th>
+              <th class="py-2 pr-2">Item Name</th>
+              <th class="py-2 pr-2">Category</th>
+              <th class="py-2 pr-2">Quantity</th>
+              <th class="py-2 pr-2">Description</th>
+              <th class="py-2 pr-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-5 shadow-xl shadow-black/20">
+      <h2 id="itemFormTitle" class="text-xl font-semibold text-amber-300">Add Item</h2>
+      <form id="itemForm" class="mt-4 space-y-3">
+        <input type="hidden" id="itemId" />
+        <div>
+          <label class="block text-sm text-slate-300">Item Name</label>
+          <input id="itemName" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Category</label>
+          <input id="itemCategory" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Quantity</label>
+          <input id="itemQuantity" type="number" min="0" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Description</label>
+          <textarea id="itemDescription" rows="3" class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2"></textarea>
+        </div>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <button type="submit" class="rounded-xl bg-amber-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-amber-300">Save Item</button>
+          <button type="button" id="cancelEdit" class="rounded-xl bg-slate-700 px-4 py-2 font-semibold transition hover:bg-slate-600">Cancel Edit</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-5 shadow-xl shadow-black/20">
+      <h2 class="text-xl font-semibold text-amber-300">Rental Logging</h2>
+      <form id="rentalForm" class="mt-4 space-y-3">
+        <div>
+          <label class="block text-sm text-slate-300">Item</label>
+          <select id="rentalItem" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2"></select>
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Quantity Hired</label>
+          <input id="rentalQuantity" type="number" min="1" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Renter Name (optional)</label>
+          <input id="renterName" class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Hire Date</label>
+          <input id="hireDate" type="date" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Expected Return Date</label>
+          <input id="returnDate" type="date" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm text-slate-300">Price Paid</label>
+          <input id="pricePaid" type="number" min="0" step="0.01" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
+        </div>
+        <button type="submit" class="w-full rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-400 sm:w-auto">Log Rental</button>
+      </form>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-5 shadow-xl shadow-black/20 lg:col-span-2">
+      <h2 class="text-xl font-semibold text-amber-300">Recent Rentals</h2>
+      <div class="mt-4 overflow-x-auto">
+        <table class="w-full min-w-[700px] border-collapse text-sm">
+          <thead>
+            <tr class="border-b border-slate-700 text-left text-slate-300">
+              <th class="py-2 pr-2">ID</th>
+              <th class="py-2 pr-2">Item</th>
+              <th class="py-2 pr-2">Qty</th>
+              <th class="py-2 pr-2">Renter</th>
+              <th class="py-2 pr-2">Hire Date</th>
+              <th class="py-2 pr-2">Return Date</th>
+              <th class="py-2 pr-2">Price</th>
+            </tr>
+          </thead>
+          <tbody id="rentalTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-5 shadow-xl shadow-black/20 lg:col-span-2">
+      <h2 class="text-xl font-semibold text-amber-300">Reports</h2>
+      <div class="mt-4 grid gap-5 md:grid-cols-2">
+        <div>
+          <h3 class="font-medium text-slate-200">Daily Summary</h3>
+          <ul id="dailyReports" class="mt-2 space-y-2 text-sm"></ul>
+        </div>
+        <div>
+          <h3 class="font-medium text-slate-200">Weekly Summary</h3>
+          <ul id="weeklyReports" class="mt-2 space-y-2 text-sm"></ul>
+        </div>
+      </div>
+    </section>
+
+    <p id="status" class="rounded-xl border border-slate-800 bg-slate-900/85 p-3 text-sm shadow-xl shadow-black/20 lg:col-span-2"></p>
+  </main>
+
+  <footer class="border-t border-amber-300/20 bg-slate-900/75 px-4 py-6">
+    <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 text-center text-sm text-slate-300 md:flex-row md:text-left">
+      <p>© 2026 Charstine Eco-Tourist Resort. Admin System.</p>
+      <p>Call/WhatsApp: <span class="font-semibold text-amber-300">0790139460</span></p>
+      <p>Email: <span class="font-semibold text-amber-300">Charstinehoteltourist@gmail.com</span></p>
+    </div>
+  </footer>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const adminEmailEl = document.getElementById('adminEmail');
+    const inventoryTable = document.getElementById('inventoryTable');
+    const rentalTable = document.getElementById('rentalTable');
+    const rentalItemSelect = document.getElementById('rentalItem');
+
+    const itemForm = document.getElementById('itemForm');
+    const itemFormTitle = document.getElementById('itemFormTitle');
+    const itemId = document.getElementById('itemId');
+    const itemName = document.getElementById('itemName');
+    const itemCategory = document.getElementById('itemCategory');
+    const itemQuantity = document.getElementById('itemQuantity');
+    const itemDescription = document.getElementById('itemDescription');
+
+    const rentalForm = document.getElementById('rentalForm');
+    const dailyReports = document.getElementById('dailyReports');
+    const weeklyReports = document.getElementById('weeklyReports');
+
+    let inventory = [];
+
+    function setStatus(message, ok = true) {
+      statusEl.textContent = message;
+      statusEl.className = `rounded-lg border p-3 text-sm lg:col-span-2 ${ok ? 'border-emerald-700 bg-emerald-950 text-emerald-200' : 'border-red-700 bg-red-950 text-red-200'}`;
+    }
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, {
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+        ...options,
+      });
+
+      if (response.status === 401) {
+        window.location.href = '/admin-login.html';
+        throw new Error('Unauthorized');
+      }
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || 'Request failed');
+      }
+      return data;
+    }
+
+    async function checkSession() {
+      const session = await api('/admin-session');
+      adminEmailEl.textContent = `Logged in as: ${session.email}`;
+    }
+
+    function renderInventory() {
+      if (inventory.length === 0) {
+        inventoryTable.innerHTML = '<tr><td colspan="6" class="py-4 text-slate-400">No inventory items found.</td></tr>';
+        return;
+      }
+
+      inventoryTable.innerHTML = inventory.map((item) => `
+        <tr class="border-b border-slate-800">
+          <td class="py-2 pr-2">${item.id}</td>
+          <td class="py-2 pr-2">${item.name}</td>
+          <td class="py-2 pr-2">${item.category}</td>
+          <td class="py-2 pr-2">${item.quantity}</td>
+          <td class="py-2 pr-2">${item.description || ''}</td>
+          <td class="py-2 pr-2">
+            <button data-action="edit" data-id="${item.id}" class="mr-2 rounded bg-amber-500 px-2 py-1 text-xs font-semibold text-slate-950 hover:bg-amber-400">Edit</button>
+            <button data-action="delete" data-id="${item.id}" class="rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-red-500">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+
+      rentalItemSelect.innerHTML = inventory.map((item) =>
+        `<option value="${item.id}">${item.name} (${item.quantity} available)</option>`
+      ).join('');
+    }
+
+    function resetItemForm() {
+      itemId.value = '';
+      itemName.value = '';
+      itemCategory.value = '';
+      itemQuantity.value = '';
+      itemDescription.value = '';
+      itemFormTitle.textContent = 'Add Item';
+    }
+
+    async function loadInventory() {
+      inventory = await api('/inventory');
+      renderInventory();
+    }
+
+    async function loadRentals() {
+      const rentals = await api('/rentals');
+      if (rentals.length === 0) {
+        rentalTable.innerHTML = '<tr><td colspan="7" class="py-4 text-slate-400">No rentals logged yet.</td></tr>';
+        return;
+      }
+
+      rentalTable.innerHTML = rentals.map((rental) => `
+        <tr class="border-b border-slate-800">
+          <td class="py-2 pr-2">${rental.id}</td>
+          <td class="py-2 pr-2">${rental.item_name}</td>
+          <td class="py-2 pr-2">${rental.quantity}</td>
+          <td class="py-2 pr-2">${rental.renter_name || '-'}</td>
+          <td class="py-2 pr-2">${String(rental.hire_date).slice(0, 10)}</td>
+          <td class="py-2 pr-2">${String(rental.return_date).slice(0, 10)}</td>
+          <td class="py-2 pr-2">${Number(rental.price).toFixed(2)}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function loadReports() {
+      const reports = await api('/reports');
+      dailyReports.innerHTML = reports.daily.length
+        ? reports.daily.map((entry) => `<li class="rounded border border-slate-800 bg-slate-950 px-3 py-2">${String(entry.period).slice(0, 10)}: ${entry.rentals_count} rentals, ${Number(entry.total_revenue).toFixed(2)} revenue</li>`).join('')
+        : '<li class="text-slate-400">No daily report data.</li>';
+
+      weeklyReports.innerHTML = reports.weekly.length
+        ? reports.weekly.map((entry) => `<li class="rounded border border-slate-800 bg-slate-950 px-3 py-2">Week of ${String(entry.period).slice(0, 10)}: ${entry.rentals_count} rentals, ${Number(entry.total_revenue).toFixed(2)} revenue</li>`).join('')
+        : '<li class="text-slate-400">No weekly report data.</li>';
+    }
+
+    itemForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      try {
+        const payload = {
+          name: itemName.value.trim(),
+          category: itemCategory.value.trim(),
+          quantity: Number(itemQuantity.value),
+          description: itemDescription.value.trim(),
+        };
+
+        if (!payload.name || !payload.category || !Number.isInteger(payload.quantity) || payload.quantity < 0) {
+          throw new Error('Please provide valid item details.');
+        }
+
+        const isEdit = Boolean(itemId.value);
+        const path = isEdit ? `/inventory/${itemId.value}` : '/inventory';
+        const method = isEdit ? 'PUT' : 'POST';
+
+        await api(path, { method, body: JSON.stringify(payload) });
+        resetItemForm();
+        await loadInventory();
+        setStatus(isEdit ? 'Item updated successfully.' : 'Item added successfully.');
+      } catch (error) {
+        setStatus(error.message, false);
+      }
+    });
+
+    document.getElementById('cancelEdit').addEventListener('click', resetItemForm);
+
+    inventoryTable.addEventListener('click', async (event) => {
+      const button = event.target.closest('button');
+      if (!button) return;
+
+      const id = Number(button.dataset.id);
+      const action = button.dataset.action;
+      const selectedItem = inventory.find((item) => item.id === id);
+      if (!selectedItem) return;
+
+      if (action === 'edit') {
+        itemId.value = String(selectedItem.id);
+        itemName.value = selectedItem.name;
+        itemCategory.value = selectedItem.category;
+        itemQuantity.value = selectedItem.quantity;
+        itemDescription.value = selectedItem.description || '';
+        itemFormTitle.textContent = `Edit Item #${selectedItem.id}`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      if (action === 'delete') {
+        if (!window.confirm(`Delete "${selectedItem.name}"?`)) return;
+        try {
+          await api(`/inventory/${selectedItem.id}`, { method: 'DELETE' });
+          await loadInventory();
+          setStatus('Item deleted successfully.');
+        } catch (error) {
+          setStatus(error.message, false);
+        }
+      }
+    });
+
+    rentalForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      try {
+        const payload = {
+          item_id: Number(document.getElementById('rentalItem').value),
+          quantity: Number(document.getElementById('rentalQuantity').value),
+          renter_name: document.getElementById('renterName').value.trim(),
+          hire_date: document.getElementById('hireDate').value,
+          return_date: document.getElementById('returnDate').value,
+          price: Number(document.getElementById('pricePaid').value),
+        };
+
+        if (!Number.isInteger(payload.item_id) || payload.item_id <= 0) throw new Error('Please select an item.');
+        if (!Number.isInteger(payload.quantity) || payload.quantity <= 0) throw new Error('Quantity must be at least 1.');
+        if (!payload.hire_date || !payload.return_date) throw new Error('Hire and return dates are required.');
+        if (payload.return_date < payload.hire_date) throw new Error('Return date cannot be before hire date.');
+        if (Number.isNaN(payload.price) || payload.price < 0) throw new Error('Price must be a valid positive number.');
+
+        await api('/rentals', { method: 'POST', body: JSON.stringify(payload) });
+        rentalForm.reset();
+        await Promise.all([loadInventory(), loadRentals(), loadReports()]);
+        setStatus('Rental logged successfully and inventory updated.');
+      } catch (error) {
+        setStatus(error.message, false);
+      }
+    });
+
+    document.getElementById('refreshInventory').addEventListener('click', async () => {
+      try {
+        await Promise.all([loadInventory(), loadRentals(), loadReports()]);
+        setStatus('Dashboard data refreshed.');
+      } catch (error) {
+        setStatus(error.message, false);
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/logout', { credentials: 'include' });
+      } catch (_error) {}
+      window.location.href = '/index.html';
+    });
+
+    async function init() {
+      try {
+        await checkSession();
+        await Promise.all([loadInventory(), loadRentals(), loadReports()]);
+        setStatus('Dashboard ready.');
+      } catch (error) {
+        setStatus(error.message || 'Failed to load dashboard.', false);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
+
