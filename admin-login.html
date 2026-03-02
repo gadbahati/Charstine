@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login | Charstine Resort</title>
+  <title>Redirecting | Charstine Resort</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
@@ -14,96 +14,13 @@
     }
   </style>
 </head>
-<body class="min-h-screen text-slate-100">
-  <main class="min-h-[calc(100vh-88px)] flex items-center justify-center px-4 py-10">
-    <section class="w-full max-w-md rounded-3xl border border-amber-300/30 bg-slate-900/85 p-6 shadow-2xl shadow-amber-500/10 backdrop-blur md:p-8">
-      <div class="mb-6">
-        <p class="inline-flex rounded-full border border-amber-200/30 bg-amber-300/10 px-3 py-1 text-xs font-semibold tracking-wide text-amber-200">CHARSTINE ADMIN</p>
-        <h1 class="mt-4 text-3xl font-bold text-amber-300">Secure Login</h1>
-        <p class="mt-2 text-sm text-slate-300">Authorized admin access only.</p>
-      </div>
-
-      <form id="loginForm" class="mt-8 space-y-4">
-        <div>
-          <label for="email" class="block text-sm font-medium text-slate-200">Email</label>
-          <input id="email" name="email" type="email" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2.5 text-slate-100 focus:border-amber-400 focus:outline-none" />
-        </div>
-        <div>
-          <label for="password" class="block text-sm font-medium text-slate-200">Password</label>
-          <input id="password" name="password" type="password" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2.5 text-slate-100 focus:border-amber-400 focus:outline-none" />
-        </div>
-        <button type="submit" class="w-full rounded-xl bg-amber-400 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-amber-300">Log In</button>
-      </form>
-
-      <p id="message" class="mt-4 text-sm"></p>
-      <a href="index.html" class="mt-6 inline-block text-sm text-amber-300 transition hover:text-amber-200">Back to website</a>
-    </section>
-  </main>
-
-  <footer class="border-t border-amber-300/20 bg-slate-900/75 px-4 py-4 text-center text-xs text-slate-300">
-    © 2026 Charstine Eco-Tourist Resort | Call/WhatsApp: 0790139460 | Charstinehoteltourist@gmail.com
-  </footer>
-
+<body class="min-h-screen flex items-center justify-center px-4 text-slate-100">
+  <div class="rounded-2xl border border-amber-300/30 bg-slate-900/85 px-6 py-5 text-center shadow-2xl">
+    <p class="text-sm text-slate-200">Redirecting to admin login...</p>
+    <a href="admin-access.html" class="mt-2 inline-block text-amber-300">Click here if not redirected</a>
+  </div>
   <script>
-    const ADMIN_EMAIL = 'charstinehoteltourist@gmail.com';
-    const ADMIN_PASSWORD = 'Resort254';
-    const AUTH_KEY = 'charstine_admin_auth';
-
-    const form = document.getElementById('loginForm');
-    const message = document.getElementById('message');
-
-    function isLoggedIn() {
-      const raw = localStorage.getItem(AUTH_KEY);
-      if (!raw) return false;
-      try {
-        const parsed = JSON.parse(raw);
-        return parsed && parsed.email === ADMIN_EMAIL;
-      } catch (_error) {
-        return false;
-      }
-    }
-
-    function setLogin() {
-      localStorage.setItem(
-        AUTH_KEY,
-        JSON.stringify({
-          email: ADMIN_EMAIL,
-          loginAt: new Date().toISOString(),
-        })
-      );
-    }
-
-    if (isLoggedIn()) {
-      window.location.href = '/admin-dashboard.html';
-    }
-
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      message.textContent = '';
-      message.className = 'mt-4 text-sm';
-
-      const email = String(form.email.value || '').trim().toLowerCase();
-      const password = String(form.password.value || '');
-
-      if (!email || !password) {
-        message.textContent = 'Please enter both email and password.';
-        message.classList.add('text-red-400');
-        return;
-      }
-
-      if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        setLogin();
-        message.textContent = 'Login successful. Redirecting...';
-        message.classList.add('text-green-400');
-        window.location.href = '/admin-dashboard.html';
-        return;
-      }
-
-      message.textContent = 'Invalid email or password.';
-      message.classList.add('text-red-400');
-    });
+    window.location.replace('/admin-access.html');
   </script>
 </body>
 </html>
-
-
