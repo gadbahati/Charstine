@@ -2,20 +2,23 @@
   "name": "charstine-admin-system",
   "version": "1.0.0",
   "description": "Charstine hotel website with admin-only inventory and rental management",
-  "main": "server.js",
+  "main": "api/server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "vercel-build": "npm install"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "bcryptjs": "^2.4.3",
     "connect-pg-simple": "^10.0.0",
     "express": "^4.21.2",
     "express-rate-limit": "^7.5.0",
     "express-session": "^1.18.1",
-    "pg": "^8.13.1"
-  }
+    "pg": "^8.13.1",
+    "rate-limit-flexible": "^2.4.1"
+  },
+  "devDependencies": {}
 }

@@ -17,6 +17,9 @@ const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres
 const pool = new Pool({
   connectionString: DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  max: 2,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
 });
 
 app.use(express.json());
@@ -48,6 +51,7 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many login attempts. Try again in 15 minutes.' },
+  store: new (require('rate-limit-flexible').RateLimiterMemory)(),
 });
 
 function requireAdmin(req, res, next) {
@@ -62,64 +66,68 @@ function normalizeEmail(email) {
 }
 
 async function ensureSchemaAndSeed() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS admin_users (
-      id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS admin_users (
+        id SERIAL PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS items (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        quantity INTEGER NOT NULL CHECK (quantity >= 0),
+        description TEXT DEFAULT ''
+      );
+
+      CREATE TABLE IF NOT EXISTS rentals (
+        id SERIAL PRIMARY KEY,
+        item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE RESTRICT,
+        quantity INTEGER NOT NULL CHECK (quantity > 0),
+        renter_name TEXT,
+        hire_date DATE NOT NULL,
+        return_date DATE NOT NULL,
+        price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
+    await pool.query(
+      `
+        INSERT INTO admin_users (id, email, password_hash)
+        VALUES (1, $1, $2)
+        ON CONFLICT (id)
+        DO UPDATE SET email = EXCLUDED.email, password_hash = EXCLUDED.password_hash
+      `,
+      [ADMIN_EMAIL, passwordHash]
     );
+    await pool.query('DELETE FROM admin_users WHERE id <> 1');
 
-    CREATE TABLE IF NOT EXISTS items (
-      id SERIAL PRIMARY KEY,
-      name TEXT NOT NULL,
-      category TEXT NOT NULL,
-      quantity INTEGER NOT NULL CHECK (quantity >= 0),
-      description TEXT DEFAULT ''
-    );
-
-    CREATE TABLE IF NOT EXISTS rentals (
-      id SERIAL PRIMARY KEY,
-      item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE RESTRICT,
-      quantity INTEGER NOT NULL CHECK (quantity > 0),
-      renter_name TEXT,
-      hire_date DATE NOT NULL,
-      return_date DATE NOT NULL,
-      price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-  `);
-
-  const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, 12);
-  await pool.query(
-    `
-      INSERT INTO admin_users (id, email, password_hash)
-      VALUES (1, $1, $2)
-      ON CONFLICT (id)
-      DO UPDATE SET email = EXCLUDED.email, password_hash = EXCLUDED.password_hash
-    `,
-    [ADMIN_EMAIL, passwordHash]
-  );
-  await pool.query('DELETE FROM admin_users WHERE id <> 1');
-
-  await pool.query(`
-    INSERT INTO items (name, category, quantity, description)
-    SELECT * FROM (VALUES
-      ('Dining Table', 'Restaurant', 10, 'Wooden tables for dining'),
-      ('Chair Set', 'Restaurant', 20, 'Comfortable dining chairs'),
-      ('Tent', 'Hall', 5, 'Large event tents'),
-      ('Projector', 'ICT', 3, 'Hall projector'),
-      ('Laptop', 'ICT', 8, 'Admin laptops'),
-      ('Bed', 'Beds', 20, 'King-size beds'),
-      ('Plate Set', 'Utensils', 50, 'Dinner plate set'),
-      ('Spoon Set', 'Utensils', 100, 'Stainless steel spoons'),
-      ('Cleaning Cart', 'Store', 5, 'Storage and housekeeping cart'),
-      ('Speaker System', 'Hall', 2, 'For hall events')
-    ) AS seed(name, category, quantity, description)
-    WHERE NOT EXISTS (SELECT 1 FROM items);
-  `);
+    await pool.query(`
+      INSERT INTO items (name, category, quantity, description)
+      SELECT * FROM (VALUES
+        ('Dining Table', 'Restaurant', 10, 'Wooden tables for dining'),
+        ('Chair Set', 'Restaurant', 20, 'Comfortable dining chairs'),
+        ('Tent', 'Hall', 5, 'Large event tents'),
+        ('Projector', 'ICT', 3, 'Hall projector'),
+        ('Laptop', 'ICT', 8, 'Admin laptops'),
+        ('Bed', 'Beds', 20, 'King-size beds'),
+        ('Plate Set', 'Utensils', 50, 'Dinner plate set'),
+        ('Spoon Set', 'Utensils', 100, 'Stainless steel spoons'),
+        ('Cleaning Cart', 'Store', 5, 'Storage and housekeeping cart'),
+        ('Speaker System', 'Hall', 2, 'For hall events')
+      ) AS seed(name, category, quantity, description)
+      WHERE NOT EXISTS (SELECT 1 FROM items);
+    `);
+  } catch (error) {
+    console.error('Schema initialization error:', error);
+  }
 }
 
-app.post('/login', loginLimiter, async (req, res) => {
+app.post('/api/login', loginLimiter, async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
     const password = String(req.body.password || '');
@@ -155,21 +163,21 @@ app.post('/login', loginLimiter, async (req, res) => {
   }
 });
 
-app.get('/logout', (req, res) => {
+app.get('/api/logout', (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('connect.sid');
     res.json({ success: true });
   });
 });
 
-app.get('/admin-session', (req, res) => {
+app.get('/api/admin-session', (req, res) => {
   if (req.session && req.session.isAdmin) {
     return res.json({ authenticated: true, email: req.session.adminEmail });
   }
   return res.status(401).json({ authenticated: false });
 });
 
-app.get('/inventory', requireAdmin, async (_req, res) => {
+app.get('/api/inventory', requireAdmin, async (_req, res) => {
   try {
     const result = await pool.query(
       'SELECT id, name, category, quantity, description FROM items ORDER BY id ASC'
@@ -181,7 +189,7 @@ app.get('/inventory', requireAdmin, async (_req, res) => {
   }
 });
 
-app.post('/inventory', requireAdmin, async (req, res) => {
+app.post('/api/inventory', requireAdmin, async (req, res) => {
   try {
     const name = String(req.body.name || '').trim();
     const category = String(req.body.category || '').trim();
@@ -208,7 +216,7 @@ app.post('/inventory', requireAdmin, async (req, res) => {
   }
 });
 
-app.put('/inventory/:id', requireAdmin, async (req, res) => {
+app.put('/api/inventory/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
     const name = String(req.body.name || '').trim();
@@ -245,7 +253,7 @@ app.put('/inventory/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.delete('/inventory/:id', requireAdmin, async (req, res) => {
+app.delete('/api/inventory/:id', requireAdmin, async (req, res) => {
   try {
     const id = Number(req.params.id);
 
@@ -266,7 +274,7 @@ app.delete('/inventory/:id', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/rentals', requireAdmin, async (_req, res) => {
+app.get('/api/rentals', requireAdmin, async (_req, res) => {
   try {
     const result = await pool.query(
       `
@@ -285,7 +293,7 @@ app.get('/rentals', requireAdmin, async (_req, res) => {
   }
 });
 
-app.post('/rentals', requireAdmin, async (req, res) => {
+app.post('/api/rentals', requireAdmin, async (req, res) => {
   const client = await pool.connect();
 
   try {
@@ -351,7 +359,7 @@ app.post('/rentals', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/reports', requireAdmin, async (_req, res) => {
+app.get('/api/reports', requireAdmin, async (_req, res) => {
   try {
     const daily = await pool.query(
       `
@@ -387,21 +395,21 @@ app.get('/reports', requireAdmin, async (_req, res) => {
   }
 });
 
-app.get('/admin-dashboard.html', (req, res) => {
+app.get('/api/admin-dashboard.html', (req, res) => {
   if (!req.session || !req.session.isAdmin) {
     return res.redirect('/admin-access.html');
   }
-  return res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+  return res.sendFile(path.join(__dirname, '../admin-dashboard.html'));
 });
 
-app.get('/admin-login.html', (req, res) => {
+app.get('/api/admin-login.html', (req, res) => {
   if (req.session && req.session.isAdmin) {
     return res.redirect('/admin-dashboard.html');
   }
-  return res.sendFile(path.join(__dirname, 'admin-access.html'));
+  return res.sendFile(path.join(__dirname, '../admin-access.html'));
 });
 
-app.use(express.static(path.join(__dirname)));
+app.use(express.static(path.join(__dirname, '..')));
 
 app.use((err, _req, res, _next) => {
   console.error('Unhandled server error:', err);
@@ -411,13 +419,12 @@ app.use((err, _req, res, _next) => {
 async function startServer() {
   try {
     await ensureSchemaAndSeed();
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
+    console.log('Database schema initialized');
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    console.error('Failed to initialize schema:', error);
   }
 }
 
 startServer();
+
+module.exports = app;

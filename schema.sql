@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
 INSERT INTO admin_users (id, email, password_hash)
 VALUES (
   1,
-  'Charstinehoteltourist@gmail.com',
-  crypt('Resort254', gen_salt('bf', 12))
+  'charstinehotelresort@gmail.com',
+  crypt('Resort254/', gen_salt('bf', 12))
 )
 ON CONFLICT (id) DO UPDATE
 SET email = EXCLUDED.email,

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -32,7 +32,7 @@
           <label for="password" class="block text-sm font-medium text-slate-200">Password</label>
           <input id="password" name="password" type="password" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2.5 text-slate-100 focus:border-amber-400 focus:outline-none" />
         </div>
-        <button type="submit" class="w-full rounded-xl bg-amber-400 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-amber-300">Log In</button>
+        <button type="submit" id="submitBtn" class="w-full rounded-xl bg-amber-400 px-4 py-2.5 font-semibold text-slate-950 transition hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed">Log In</button>
       </form>
 
       <p id="message" class="mt-4 text-sm"></p>
@@ -41,46 +41,36 @@
   </main>
 
   <footer class="border-t border-amber-300/20 bg-slate-900/75 px-4 py-4 text-center text-xs text-slate-300">
-    © 2026 Charstine Eco-Tourist Resort | Call/WhatsApp: 0790139460 | Charstinehoteltourist@gmail.com
+    © 2026 Charstine Eco-Tourist Resort | Call/WhatsApp: 0790139460 | charstinehotelresort@gmail.com
   </footer>
 
   <script>
-    const AUTH_KEY = 'charstine_admin_ok';
-    const AUTH_EMAIL_KEY = 'charstine_admin_email';
-
     const form = document.getElementById('loginForm');
     const message = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
 
-    function hasCookie(name) {
-      return document.cookie.split(';').some((row) => row.trim().startsWith(`${name}=`));
-    }
-
-    function isLoggedIn() {
+    // Check if already logged in
+    async function checkSession() {
       try {
-        if (localStorage.getItem(AUTH_KEY) === '1') return true;
-      } catch (_error) {}
-      try {
-        if (sessionStorage.getItem(AUTH_KEY) === '1') return true;
-      } catch (_error) {}
-      return hasCookie(AUTH_KEY);
+        const response = await fetch('/api/admin-session');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.authenticated) {
+            window.location.replace('/admin-dashboard.html');
+          }
+        }
+      } catch (error) {
+        console.error('Session check error:', error);
+      }
     }
 
-    function setLogin(email) {
-      try { localStorage.setItem(AUTH_KEY, '1'); } catch (_error) {}
-      try { localStorage.setItem(AUTH_EMAIL_KEY, email); } catch (_error) {}
-      try { sessionStorage.setItem(AUTH_KEY, '1'); } catch (_error) {}
-      try { sessionStorage.setItem(AUTH_EMAIL_KEY, email); } catch (_error) {}
-      document.cookie = `${AUTH_KEY}=1; Path=/; Max-Age=28800; SameSite=Lax`;
-    }
+    checkSession();
 
-    if (isLoggedIn()) {
-      window.location.replace('/admin-dashboard.html');
-    }
-
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       message.textContent = '';
       message.className = 'mt-4 text-sm';
+      submitBtn.disabled = true;
 
       const email = String(form.email.value || '').trim().toLowerCase();
       const password = String(form.password.value || '');
@@ -88,20 +78,36 @@
       if (!email || !password) {
         message.textContent = 'Please enter both email and password.';
         message.classList.add('text-red-400');
+        submitBtn.disabled = false;
         return;
       }
 
-      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      if (validEmail && password.length > 0) {
-        setLogin(email);
-        message.textContent = 'Login successful. Redirecting...';
-        message.classList.add('text-green-400');
-        window.location.replace('/admin-dashboard.html');
-        return;
-      }
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
 
-      message.textContent = 'Please enter a valid email and password.';
-      message.classList.add('text-red-400');
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          message.textContent = 'Login successful. Redirecting...';
+          message.classList.add('text-green-400');
+          setTimeout(() => {
+            window.location.replace('/admin-dashboard.html');
+          }, 500);
+        } else {
+          message.textContent = data.error || 'Login failed. Please try again.';
+          message.classList.add('text-red-400');
+          submitBtn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        message.textContent = 'An error occurred. Please try again.';
+        message.classList.add('text-red-400');
+        submitBtn.disabled = false;
+      }
     });
   </script>
 </body>

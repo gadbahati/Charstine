@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -20,7 +20,7 @@
     <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-4">
       <div class="min-w-0">
         <h1 class="text-2xl font-bold text-amber-300">Admin Inventory & Rentals</h1>
-        <p id="adminEmail" class="truncate text-sm text-slate-300"></p>
+        <p id="adminEmail" class="truncate text-sm text-slate-300">Loading...</p>
       </div>
       <button id="logoutBtn" class="rounded-xl bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-400">Logout</button>
     </div>
@@ -70,7 +70,7 @@
           <textarea id="itemDescription" rows="3" class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2"></textarea>
         </div>
         <div class="flex flex-col gap-2 sm:flex-row">
-          <button type="submit" class="rounded-xl bg-amber-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-amber-300">Save Item</button>
+          <button type="submit" id="saveItemBtn" class="rounded-xl bg-amber-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-amber-300 disabled:opacity-50">Save Item</button>
           <button type="button" id="cancelEdit" class="rounded-xl bg-slate-700 px-4 py-2 font-semibold transition hover:bg-slate-600">Cancel Edit</button>
         </div>
       </form>
@@ -103,7 +103,7 @@
           <label class="block text-sm text-slate-300">Price Paid</label>
           <input id="pricePaid" type="number" min="0" step="0.01" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2" />
         </div>
-        <button type="submit" class="w-full rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-400 sm:w-auto">Log Rental</button>
+        <button type="submit" id="logRentalBtn" class="w-full rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-50 sm:w-auto">Log Rental</button>
       </form>
     </section>
 
@@ -148,16 +148,11 @@
     <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 text-center text-sm text-slate-300 md:flex-row md:text-left">
       <p>© 2026 Charstine Eco-Tourist Resort. Admin System.</p>
       <p>Call/WhatsApp: <span class="font-semibold text-amber-300">0790139460</span></p>
-      <p>Email: <span class="font-semibold text-amber-300">Charstinehoteltourist@gmail.com</span></p>
+      <p>Email: <span class="font-semibold text-amber-300">charstinehotelresort@gmail.com</span></p>
     </div>
   </footer>
 
   <script>
-    const AUTH_KEY = 'charstine_admin_ok';
-    const AUTH_EMAIL_KEY = 'charstine_admin_email';
-    const INVENTORY_KEY = 'charstine_inventory';
-    const RENTALS_KEY = 'charstine_rentals';
-
     const statusEl = document.getElementById('status');
     const adminEmailEl = document.getElementById('adminEmail');
     const inventoryTable = document.getElementById('inventoryTable');
@@ -171,82 +166,65 @@
     const itemCategory = document.getElementById('itemCategory');
     const itemQuantity = document.getElementById('itemQuantity');
     const itemDescription = document.getElementById('itemDescription');
+    const saveItemBtn = document.getElementById('saveItemBtn');
 
     const rentalForm = document.getElementById('rentalForm');
+    const logRentalBtn = document.getElementById('logRentalBtn');
     const dailyReports = document.getElementById('dailyReports');
     const weeklyReports = document.getElementById('weeklyReports');
 
-    const defaultInventory = [
-      { id: 1, name: 'Dining Table', category: 'Restaurant', quantity: 10, description: 'Wooden tables for dining' },
-      { id: 2, name: 'Chair Set', category: 'Restaurant', quantity: 20, description: 'Comfortable dining chairs' },
-      { id: 3, name: 'Tent', category: 'Hall', quantity: 5, description: 'Large event tents' },
-      { id: 4, name: 'Projector', category: 'ICT', quantity: 3, description: 'Hall projector' },
-      { id: 5, name: 'Laptop', category: 'ICT', quantity: 8, description: 'Admin laptops' },
-      { id: 6, name: 'Bed', category: 'Beds', quantity: 20, description: 'King-size beds' },
-      { id: 7, name: 'Plate Set', category: 'Utensils', quantity: 50, description: 'Dinner plate set' },
-      { id: 8, name: 'Spoon Set', category: 'Utensils', quantity: 100, description: 'Stainless steel spoons' },
-      { id: 9, name: 'Cleaning Cart', category: 'Store', quantity: 5, description: 'Storage and housekeeping cart' },
-      { id: 10, name: 'Speaker System', category: 'Hall', quantity: 2, description: 'For hall events' },
-    ];
-
     let inventory = [];
     let rentals = [];
-
-    function hasCookie(name) {
-      return document.cookie.split(';').some((row) => row.trim().startsWith(`${name}=`));
-    }
-
-    function ensureAuth() {
-      let ok = false;
-      let email = 'Website Owner';
-      try { if (localStorage.getItem(AUTH_KEY) === '1') ok = true; } catch (_error) {}
-      try { if (sessionStorage.getItem(AUTH_KEY) === '1') ok = true; } catch (_error) {}
-      if (hasCookie(AUTH_KEY)) ok = true;
-
-      try { email = localStorage.getItem(AUTH_EMAIL_KEY) || email; } catch (_error) {}
-      try { email = sessionStorage.getItem(AUTH_EMAIL_KEY) || email; } catch (_error) {}
-
-      adminEmailEl.textContent = ok
-        ? `Logged in as: ${email}`
-        : 'Open dashboard mode';
-      return ok;
-    }
 
     function setStatus(message, ok = true) {
       statusEl.textContent = message;
       statusEl.className = `rounded-lg border p-3 text-sm lg:col-span-2 ${ok ? 'border-emerald-700 bg-emerald-950 text-emerald-200' : 'border-red-700 bg-red-950 text-red-200'}`;
     }
 
-    function loadLocalState() {
-      const rawInventory = localStorage.getItem(INVENTORY_KEY);
-      const rawRentals = localStorage.getItem(RENTALS_KEY);
-
-      if (!rawInventory) {
-        inventory = [...defaultInventory];
-        localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-      } else {
-        try {
-          inventory = JSON.parse(rawInventory) || [];
-        } catch (_error) {
-          inventory = [...defaultInventory];
+    async function checkAuth() {
+      try {
+        const response = await fetch('/api/admin-session');
+        if (!response.ok) {
+          window.location.replace('/admin-access.html');
+          return false;
         }
-      }
-
-      if (!rawRentals) {
-        rentals = [];
-        localStorage.setItem(RENTALS_KEY, JSON.stringify(rentals));
-      } else {
-        try {
-          rentals = JSON.parse(rawRentals) || [];
-        } catch (_error) {
-          rentals = [];
+        const data = await response.json();
+        if (!data.authenticated) {
+          window.location.replace('/admin-access.html');
+          return false;
         }
+        adminEmailEl.textContent = `Logged in as: ${data.email}`;
+        return true;
+      } catch (error) {
+        console.error('Auth check error:', error);
+        window.location.replace('/admin-access.html');
+        return false;
       }
     }
 
-    function persistState() {
-      localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-      localStorage.setItem(RENTALS_KEY, JSON.stringify(rentals));
+    async function loadInventory() {
+      try {
+        const response = await fetch('/api/inventory');
+        if (!response.ok) throw new Error('Failed to load inventory');
+        inventory = await response.json();
+        renderInventory();
+      } catch (error) {
+        console.error('Load inventory error:', error);
+        setStatus('Failed to load inventory', false);
+      }
+    }
+
+    async function loadRentals() {
+      try {
+        const response = await fetch('/api/rentals');
+        if (!response.ok) throw new Error('Failed to load rentals');
+        rentals = await response.json();
+        renderRentals();
+        renderReports();
+      } catch (error) {
+        console.error('Load rentals error:', error);
+        setStatus('Failed to load rentals', false);
+      }
     }
 
     function renderInventory() {
@@ -283,28 +261,17 @@
       }
 
       const sortedRentals = [...rentals].sort((a, b) => new Date(b.hire_date) - new Date(a.hire_date) || b.id - a.id);
-      rentalTable.innerHTML = sortedRentals.map((rental) => {
-        const item = inventory.find((x) => x.id === rental.item_id);
-        return `
-          <tr class="border-b border-slate-800">
-            <td class="py-2 pr-2">${rental.id}</td>
-            <td class="py-2 pr-2">${item ? item.name : 'Deleted Item'}</td>
-            <td class="py-2 pr-2">${rental.quantity}</td>
-            <td class="py-2 pr-2">${rental.renter_name || '-'}</td>
-            <td class="py-2 pr-2">${rental.hire_date}</td>
-            <td class="py-2 pr-2">${rental.return_date}</td>
-            <td class="py-2 pr-2">${Number(rental.price).toFixed(2)}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function startOfWeek(dateStr) {
-      const date = new Date(dateStr);
-      const day = date.getUTCDay();
-      const diff = (day + 6) % 7;
-      date.setUTCDate(date.getUTCDate() - diff);
-      return date.toISOString().slice(0, 10);
+      rentalTable.innerHTML = sortedRentals.map((rental) => `
+        <tr class="border-b border-slate-800">
+          <td class="py-2 pr-2">${rental.id}</td>
+          <td class="py-2 pr-2">${rental.item_name || 'Unknown Item'}</td>
+          <td class="py-2 pr-2">${rental.quantity}</td>
+          <td class="py-2 pr-2">${rental.renter_name || '-'}</td>
+          <td class="py-2 pr-2">${rental.hire_date}</td>
+          <td class="py-2 pr-2">${rental.return_date}</td>
+          <td class="py-2 pr-2">${Number(rental.price).toFixed(2)}</td>
+        </tr>
+      `).join('');
     }
 
     function renderReports() {
@@ -339,6 +306,14 @@
         : '<li class="text-slate-400">No weekly report data.</li>';
     }
 
+    function startOfWeek(dateStr) {
+      const date = new Date(dateStr);
+      const day = date.getUTCDay();
+      const diff = (day + 6) % 7;
+      date.setUTCDate(date.getUTCDate() - diff);
+      return date.toISOString().slice(0, 10);
+    }
+
     function resetItemForm() {
       itemId.value = '';
       itemName.value = '';
@@ -348,14 +323,10 @@
       itemFormTitle.textContent = 'Add Item';
     }
 
-    function refreshAllViews() {
-      renderInventory();
-      renderRentals();
-      renderReports();
-    }
-
-    itemForm.addEventListener('submit', (event) => {
+    itemForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      saveItemBtn.disabled = true;
+
       try {
         const payload = {
           name: itemName.value.trim(),
@@ -368,32 +339,40 @@
           throw new Error('Please provide valid item details.');
         }
 
+        let response;
         if (itemId.value) {
-          const editId = Number(itemId.value);
-          const target = inventory.find((item) => item.id === editId);
-          if (!target) throw new Error('Item not found.');
-          target.name = payload.name;
-          target.category = payload.category;
-          target.quantity = payload.quantity;
-          target.description = payload.description;
-          setStatus('Item updated successfully.');
+          const id = Number(itemId.value);
+          response = await fetch(`/api/inventory/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
         } else {
-          const nextId = inventory.reduce((max, item) => Math.max(max, item.id), 0) + 1;
-          inventory.push({ id: nextId, ...payload });
-          setStatus('Item added successfully.');
+          response = await fetch('/api/inventory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
         }
 
-        persistState();
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to save item');
+        }
+
+        setStatus(itemId.value ? 'Item updated successfully.' : 'Item added successfully.');
         resetItemForm();
-        refreshAllViews();
+        await loadInventory();
       } catch (error) {
         setStatus(error.message, false);
+      } finally {
+        saveItemBtn.disabled = false;
       }
     });
 
     document.getElementById('cancelEdit').addEventListener('click', resetItemForm);
 
-    inventoryTable.addEventListener('click', (event) => {
+    inventoryTable.addEventListener('click', async (event) => {
       const button = event.target.closest('button');
       if (!button) return;
 
@@ -414,20 +393,26 @@
 
       if (action === 'delete') {
         if (!window.confirm(`Delete "${selectedItem.name}"?`)) return;
-        inventory = inventory.filter((item) => item.id !== selectedItem.id);
-        persistState();
-        refreshAllViews();
-        setStatus('Item deleted successfully.');
+        try {
+          const response = await fetch(`/api/inventory/${id}`, { method: 'DELETE' });
+          if (!response.ok) throw new Error('Failed to delete item');
+          setStatus('Item deleted successfully.');
+          await loadInventory();
+        } catch (error) {
+          setStatus(error.message, false);
+        }
       }
     });
 
-    rentalForm.addEventListener('submit', (event) => {
+    rentalForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      logRentalBtn.disabled = true;
+
       try {
         const payload = {
           item_id: Number(document.getElementById('rentalItem').value),
           quantity: Number(document.getElementById('rentalQuantity').value),
-          renter_name: document.getElementById('renterName').value.trim(),
+          renter_name: document.getElementById('renterName').value.trim() || null,
           hire_date: document.getElementById('hireDate').value,
           return_date: document.getElementById('returnDate').value,
           price: Number(document.getElementById('pricePaid').value),
@@ -439,45 +424,48 @@
         if (payload.return_date < payload.hire_date) throw new Error('Return date cannot be before hire date.');
         if (Number.isNaN(payload.price) || payload.price < 0) throw new Error('Price must be a valid positive number.');
 
-        const item = inventory.find((x) => x.id === payload.item_id);
-        if (!item) throw new Error('Selected item no longer exists.');
-        if (item.quantity < payload.quantity) throw new Error(`Insufficient stock. Available quantity: ${item.quantity}.`);
-
-        item.quantity -= payload.quantity;
-        const nextRentalId = rentals.reduce((max, rental) => Math.max(max, rental.id), 0) + 1;
-        rentals.push({
-          id: nextRentalId,
-          ...payload,
+        const response = await fetch('/api/rentals', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
         });
 
-        persistState();
-        rentalForm.reset();
-        refreshAllViews();
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || 'Failed to log rental');
+        }
+
         setStatus('Rental logged successfully and inventory updated.');
+        rentalForm.reset();
+        await loadInventory();
+        await loadRentals();
       } catch (error) {
         setStatus(error.message, false);
+      } finally {
+        logRentalBtn.disabled = false;
       }
     });
 
-    document.getElementById('refreshInventory').addEventListener('click', () => {
-      loadLocalState();
-      refreshAllViews();
+    document.getElementById('refreshInventory').addEventListener('click', async () => {
+      await loadInventory();
+      await loadRentals();
       setStatus('Dashboard data refreshed.');
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      try { localStorage.removeItem(AUTH_KEY); } catch (_error) {}
-      try { localStorage.removeItem(AUTH_EMAIL_KEY); } catch (_error) {}
-      try { sessionStorage.removeItem(AUTH_KEY); } catch (_error) {}
-      try { sessionStorage.removeItem(AUTH_EMAIL_KEY); } catch (_error) {}
-      document.cookie = `${AUTH_KEY}=; Path=/; Max-Age=0; SameSite=Lax`;
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        await fetch('/api/logout');
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
       window.location.replace('/index.html');
     });
 
-    function init() {
-      ensureAuth();
-      loadLocalState();
-      refreshAllViews();
+    async function init() {
+      const authenticated = await checkAuth();
+      if (!authenticated) return;
+      await loadInventory();
+      await loadRentals();
       setStatus('Dashboard ready.');
     }
 
@@ -485,7 +473,3 @@
   </script>
 </body>
 </html>
-
-
-
-

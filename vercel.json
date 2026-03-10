@@ -1,11 +1,23 @@
 {
+  "buildCommand": "npm install",
+  "outputDirectory": ".",
+  "framework": "express",
+  "functions": {
+    "server.js": {
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
-    { "source": "/login", "destination": "/api/login" },
-    { "source": "/logout", "destination": "/api/logout" },
-    { "source": "/admin-session", "destination": "/api/admin-session" },
-    { "source": "/inventory", "destination": "/api/inventory" },
-    { "source": "/inventory/:id", "destination": "/api/inventory/:id" },
-    { "source": "/rentals", "destination": "/api/rentals" },
-    { "source": "/reports", "destination": "/api/reports" }
-  ]
+    { "source": "/login", "destination": "/api/server" },
+    { "source": "/logout", "destination": "/api/server" },
+    { "source": "/admin-session", "destination": "/api/server" },
+    { "source": "/inventory", "destination": "/api/server" },
+    { "source": "/inventory/:id", "destination": "/api/server" },
+    { "source": "/rentals", "destination": "/api/server" },
+    { "source": "/reports", "destination": "/api/server" }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
