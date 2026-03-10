@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin System Features | Charstine Eco-Tourist Resort</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Crimson+Text:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    body { font-family: 'Crimson Text', serif; background: #0a0a0a; color: #f5e6d3; }
+    h1, h2, h3, h4 { font-family: 'Cinzel Decorative', cursive; letter-spacing: 2px; }
+    .gold { color: #FFD700; }
+    .gold-glow { text-shadow: 0 0 5px #FFD700; }
+    .btn-gold {
+      background: linear-gradient(145deg, #FFD700, #DAA520);
+      box-shadow: 0 10px 30px rgba(201,163,76,0.4);
+      transition: all 0.4s ease;
+    }
+    .btn-gold:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 20px 40px rgba(255,215,0,0.6);
+    }
+    .border-gold { border: 3px double #FFD700; }
+    .icon-gold { color: #FFD700; transition: transform 0.3s ease; }
+    .icon-gold:hover { transform: scale(1.2); }
+
+    /* Floating Live Chat Button Styles */
+    .live-chat-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background-color: #25D366; /* WhatsApp green */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      color: white;
+    }
+    .live-chat-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 15px rgba(37, 211, 102, 0.6);
+    }
+    .live-chat-label {
+      position: absolute;
+      bottom: 70px;
+      right: 0;
+      background: rgba(15, 15, 15, 0.9);
+      color: #f5e6d3;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      transform: translateY(10px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    .live-chat-btn:hover .live-chat-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @media (max-width: 640px) {
+      .live-chat-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 15px;
+        right: 15px;
+      }
+      .live-chat-label {
+        font-size: 12px;
+        padding: 6px 12px;
+        bottom: 60px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-black text-[#f5e6d3] min-h-screen">
+
+  <!-- Header -->
+  <header class="relative bg-gradient-to-b from-black via-[#111] to-black py-10 border-b-4 border-double border-[#FFD700]">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+      <div class="text-center md:text-left">
+        <h1 class="text-5xl md:text-7xl font-black gold gold-glow">CHARSTINE</h1>
+        <p class="text-2xl tracking-widest gold mt-2">ECO-TOURIST RESORT</p>
+        <p class="text-sm tracking-widest opacity-80">Kamukuywa • Bungoma • Kenya</p>
+      </div>
+      <nav class="mt-6 md:mt-0 flex flex-wrap justify-center gap-6 md:gap-10 text-lg font-semibold">
+        <a href="index.html" class="gold hover:text-[#FFD700] transition"><i class="fas fa-home mr-2"></i>Home</a>
+        <a href="services.html" class="gold hover:text-[#FFD700]"><i class="fas fa-concierge-bell mr-2"></i>Services</a>
+        <a href="gallery.html" class="gold hover:text-[#FFD700]"><i class="fas fa-images mr-2"></i>Gallery</a>
+        <a href="booking.html" class="gold hover:text-[#FFD700]"><i class="fas fa-calendar-check mr-2"></i>Reserve</a>
+        <a href="contact.html" class="gold hover:text-[#FFD700]"><i class="fas fa-envelope mr-2"></i>Contact</a>
+        <a href="admin-access.html" class="gold hover:text-[#FFD700]"><i class="fas fa-user-shield mr-2"></i>Admin</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-12">
+    <h2 class="text-4xl font-black gold gold-glow text-center mb-10">Admin System Features</h2>
+
+    <section class="mb-12">
+      <h3 class="text-3xl font-bold gold mb-6">Secure Admin Access</h3>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-user-lock mr-2"></i>Exclusive Access</h4>
+          <p class="text-lg text-gray-300">The system is designed for a single, dedicated administrator. There are no public account creation options or multi-user functionalities, ensuring only authorized personnel can manage hotel operations.</p>
+        </div>
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-shield-alt mr-2"></i>Robust Security</h4>
+          <p class="text-lg text-gray-300">Login is secured with server-side authentication and bcrypt password hashing, protecting your credentials. Rate limiting is implemented to prevent brute-force attacks, and sessions are managed securely with an 8-hour expiration.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h3 class="text-3xl font-bold gold mb-6">Comprehensive Admin Dashboard</h3>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-boxes mr-2"></i>Inventory Management</h4>
+          <p class="text-lg text-gray-300">View, add, edit, and delete all hotel items, including tents, utensils, catering equipment, and more. Keep track of quantities and detailed descriptions to maintain accurate stock levels.</p>
+        </div>
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-clipboard-list mr-2"></i>Rental Logging</h4>
+          <p class="text-lg text-gray-300">Effortlessly record new rentals with essential details such as item name, quantity hired, renter's name (optional), hire date, expected return date, and price paid. The system automatically adjusts inventory levels.</p>
+        </div>
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-chart-line mr-2"></i>Performance Reports</h4>
+          <p class="text-lg text-gray-300">Access insightful daily and weekly reports on rental activity and revenue. These reports provide a clear overview of your operations, helping you make informed decisions.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h3 class="text-3xl font-bold gold mb-6">Technical & Security Highlights</h3>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-database mr-2"></i>Robust Database Integration</h4>
+          <p class="text-lg text-gray-300">Built on a PostgreSQL database, ensuring data integrity and reliability. Rental logging benefits from transaction support, preventing inconsistencies in inventory and rental records.</p>
+        </div>
+        <div class="bg-[#111] p-6 rounded-lg border border-[#FFD700]/30 shadow-lg">
+          <h4 class="text-xl font-semibold gold mb-3"><i class="fas fa-server mr-2"></i>Vercel Optimized</h4>
+          <p class="text-lg text-gray-300">The system is optimized for deployment on Vercel's free tier, utilizing serverless functions for efficient and cost-effective operation. Static assets are served optimally for fast loading times.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="relative bg-black border-t-8 border-double border-[#FFD700] py-16 mt-24">
+    <div class="absolute inset-0 opacity-20"><div class="absolute inset-0 bg-gradient-to-t from-[#FFD700] to-transparent"></div></div>
+    <div class="relative max-w-7xl mx-auto px-6 text-center">
+      <h2 class="text-5xl md:text-7xl font-black gold gold-glow mb-8">CHARSTINE</h2>
+      <p class="text-xl tracking-widest text-amber-200 mb-10">Charstine Eco-Tousrist Resort • Kamukuywa, Bungoma • Kenya</p>
+      <!-- Contact Buttons -->
+      <div class="flex flex-col sm:flex-row justify-center gap-6 mb-12">
+        <a href="booking.html" class="btn-gold px-8 sm:px-12 py-4 sm:py-6 text-black font-bold text-lg sm:text-xl tracking-widest text-center hover:shadow-2xl transform hover:scale-105 transition">
+          RESERVE YOUR SUITE
+        </a>
+        <a href="gallery.html" class="border-gold border-4 px-8 sm:px-12 py-4 sm:py-6 text-[#FFD700] font-bold text-lg sm:text-xl tracking-widest hover:bg-[#FFD700] hover:text-black transition">
+          VIEW THE PALACE
+        </a>
+      </div>
+      <div class="flex justify-center gap-8 mb-10 flex-wrap text-4xl">
+        <a href="https://web.facebook.com/p/Charstine-Eco-tourist-Resort-100063926775311/?_rdc=1&_rdr#" target="_blank" class="icon-gold hover:text-[#FFD700] transform hover:scale-125 transition"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://instagram.com/charstine" target="_blank" class="icon-gold hover:text-[#FFD700] transform hover:scale-125 transition"><i class="fab fa-instagram"></i></a>
+        <a href="https://wa.me/254790139460" target="_blank" class="icon-gold hover:text-[#FFD700] transform hover:scale-125 transition"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://x.com/charstine" target="_blank" class="icon-gold hover:text-[#FFD700] transform hover:scale-125 transition"><i class="fab fa-x-twitter"></i></a>
+        <a href="https://tiktok.com/@charstine" target="_blank" class="icon-gold hover:text-[#FFD700] transform hover:scale-125 transition"><i class="fab fa-tiktok"></i></a>
+        <a href="https://youtube.com/@charstine" target="_blank" class="icon-gold hover:text-[#FFD700] transform hover:scale-125 transition"><i class="fab fa-youtube"></i></a>
+      </div>
+      <div class="text-amber-100 space-y-3 text-lg">
+        <p>Telephone & WhatsApp: <span class="gold font-bold">0790139460</span></p>
+        <p>Correspondence: <span class="gold font-bold">charstinehotelresort@gmail.com</span></p>
+      </div>
+      <p class="mt-12 text-amber-300 tracking-widest text-sm">© 2026 Charstine Eco-Tourist Resort — All Rights Reserved<br><span class="text-amber-400">Where Even the Sun Rises in Gold</span></p>
+    </div>
+  </footer>
+
+  <!-- Floating Live Chat -->
+  <a href="https://wa.me/254790139460?text=Hello%2C%20I%20would%20like%20to%20make%20an%20enquiry." target="_blank" class="live-chat-btn">
+    <i class="fab fa-whatsapp text-3xl"></i>
+    <span class="live-chat-label">Live Chat</span>
+  </a>
+
+</body>
+</html>
