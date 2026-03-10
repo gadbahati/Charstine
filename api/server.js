@@ -51,7 +51,7 @@ const loginLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many login attempts. Try again in 15 minutes.' },
-  store: new (require('rate-limit-flexible').RateLimiterMemory)(),
+  skip: (req) => process.env.NODE_ENV !== 'production',
 });
 
 function requireAdmin(req, res, next) {
@@ -395,36 +395,20 @@ app.get('/api/reports', requireAdmin, async (_req, res) => {
   }
 });
 
-app.get('/api/admin-dashboard.html', (req, res) => {
-  if (!req.session || !req.session.isAdmin) {
-    return res.redirect('/admin-access.html');
-  }
-  return res.sendFile(path.join(__dirname, '../admin-dashboard.html'));
-});
+// Serve static files from public directory
+app.use(express.static(path.join(__dirname, '../public')));
 
-app.get('/api/admin-login.html', (req, res) => {
-  if (req.session && req.session.isAdmin) {
-    return res.redirect('/admin-dashboard.html');
-  }
-  return res.sendFile(path.join(__dirname, '../admin-access.html'));
+// Fallback for SPA routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
 });
-
-app.use(express.static(path.join(__dirname, '..')));
 
 app.use((err, _req, res, _next) => {
   console.error('Unhandled server error:', err);
   res.status(500).json({ error: 'Internal server error.' });
 });
 
-async function startServer() {
-  try {
-    await ensureSchemaAndSeed();
-    console.log('Database schema initialized');
-  } catch (error) {
-    console.error('Failed to initialize schema:', error);
-  }
-}
-
-startServer();
+// Initialize schema on startup
+ensureSchemaAndSeed();
 
 module.exports = app;

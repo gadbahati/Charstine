@@ -1,21 +1,24 @@
 {
-  "buildCommand": "npm install",
-  "outputDirectory": ".",
-  "framework": "express",
-  "functions": {
-    "server.js": {
-      "memory": 1024,
-      "maxDuration": 30
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
-  },
-  "rewrites": [
-    { "source": "/login", "destination": "/api/server" },
-    { "source": "/logout", "destination": "/api/server" },
-    { "source": "/admin-session", "destination": "/api/server" },
-    { "source": "/inventory", "destination": "/api/server" },
-    { "source": "/inventory/:id", "destination": "/api/server" },
-    { "source": "/rentals", "destination": "/api/server" },
-    { "source": "/reports", "destination": "/api/server" }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "api/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
   ],
   "env": {
     "NODE_ENV": "production"
