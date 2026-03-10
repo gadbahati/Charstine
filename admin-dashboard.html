@@ -455,21 +455,25 @@
       syncBtn.textContent = 'Syncing...';
 
       try {
+        console.log('Starting sync request...');
         const response = await fetch('/api/migrate-items', {
           method: 'POST',
           headers: { 'X-Migration-Secret': 'migrate-charstine-items-2026' },
         });
 
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Response data:', data);
+
         if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || 'Migration failed');
+          throw new Error(data.error || data.details || 'Migration failed');
         }
 
-        const data = await response.json();
         setStatus('Successfully synced ' + data.itemsCount + ' inventory items!');
         await loadInventory();
         await loadRentals();
       } catch (error) {
+        console.error('Sync error:', error);
         setStatus('Failed to sync items: ' + error.message, false);
       } finally {
         syncBtn.disabled = false;

@@ -1,12 +1,7 @@
 const { Pool } = require('pg');
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/charstine';
-const MIGRATION_SECRET = process.env.MIGRATION_SECRET || 'migrate-charstine-items-2026';
-
-const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-});
+const DATABASE_URL = process.env.DATABASE_URL;
+const MIGRATION_SECRET = 'migrate-charstine-items-2026';
 
 const ITEMS = [
   // Kitchen Inventory Items
@@ -80,17 +75,28 @@ module.exports = async (req, res) => {
   // Verify the migration secret
   const secret = req.headers['x-migration-secret'] || req.body.secret;
   if (secret !== MIGRATION_SECRET) {
+    console.error('Invalid migration secret provided');
     return res.status(401).json({ error: 'Unauthorized. Invalid migration secret.' });
   }
+
+  // Check if DATABASE_URL is set
+  if (!DATABASE_URL) {
+    console.error('DATABASE_URL environment variable is not set');
+    return res.status(500).json({ error: 'Database configuration error. DATABASE_URL not set.' });
+  }
+
+  const pool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  });
 
   const client = await pool.connect();
 
   try {
+    console.log('Starting migration...');
+
     // Start transaction
     await client.query('BEGIN');
-
-    // Delete existing items (optional - comment out if you want to keep existing items)
-    // await client.query('DELETE FROM items WHERE id >= 1 AND id <= 57');
 
     // Insert all items
     let insertedCount = 0;
@@ -108,7 +114,7 @@ module.exports = async (req, res) => {
         );
         insertedCount++;
       } catch (itemError) {
-        console.error(`Error inserting item ${item.id}:`, itemError);
+        console.error(`Error inserting item ${item.id}:`, itemError.message);
       }
     }
 
@@ -118,16 +124,27 @@ module.exports = async (req, res) => {
     // Commit transaction
     await client.query('COMMIT');
 
+    console.log(`Migration completed. ${insertedCount} items inserted.`);
+
     return res.status(200).json({
       success: true,
       message: `Successfully migrated ${insertedCount} inventory items.`,
       itemsCount: insertedCount,
     });
   } catch (error) {
-    await client.query('ROLLBACK');
-    console.error('Migration error:', error);
-    return res.status(500).json({ error: 'Migration failed.', details: error.message });
+    try {
+      await client.query('ROLLBACK');
+    } catch (rollbackError) {
+      console.error('Rollback error:', rollbackError.message);
+    }
+    console.error('Migration error:', error.message);
+    return res.status(500).json({ 
+      error: 'Migration failed.',
+      details: error.message,
+      hint: 'Check that DATABASE_URL is set and the database is accessible.'
+    });
   } finally {
     client.release();
+    await pool.end();
   }
 };
