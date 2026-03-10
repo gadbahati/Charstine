@@ -18,6 +18,19 @@
       table { font-size: 0.75rem; }
       th, td { padding: 0.5rem 0.25rem; }
       button { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+      input, select, textarea { font-size: 16px; }
+    }
+    @media (max-width: 480px) {
+      .flex-col { gap: 0.5rem; }
+      button { padding: 0.4rem 0.6rem; font-size: 0.7rem; }
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #fbbf24;
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+    }
+    button:active {
+      transform: scale(0.98);
     }
   </style>
 </head>
@@ -391,8 +404,10 @@
           <td class="py-2 px-1 sm:px-2">${item.quantity}</td>
           <td class="py-2 px-1 sm:px-2 text-xs">${item.description || ''}</td>
           <td class="py-2 px-1 sm:px-2">
-            <button data-action="edit" data-id="${item.id}" class="mr-1 rounded bg-amber-500 px-2 py-1 text-xs font-semibold text-slate-950 hover:bg-amber-400">Edit</button>
-            <button data-action="delete" data-id="${item.id}" class="rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-red-500">Delete</button>
+            <div class="flex flex-col sm:flex-row gap-1">
+              <button data-action="edit" data-id="${item.id}" class="flex-1 sm:flex-none rounded bg-amber-500 px-2 py-1 text-xs font-semibold text-slate-950 hover:bg-amber-400 transition">Edit</button>
+              <button data-action="delete" data-id="${item.id}" class="flex-1 sm:flex-none rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-red-500 transition">Delete</button>
+            </div>
           </td>
         </tr>
       `).join('');
