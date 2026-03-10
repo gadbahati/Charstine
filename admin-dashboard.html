@@ -74,7 +74,10 @@
 
     <!-- Add Item Section -->
     <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20">
-      <h2 id="itemFormTitle" class="text-lg sm:text-xl font-semibold text-amber-300">Add Item</h2>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-2">
+        <h2 id="itemFormTitle" class="text-lg sm:text-xl font-semibold text-amber-300">Add Item</h2>
+        <span class="text-xs text-slate-400">Fill the form below and click Save Item</span>
+      </div>
       <form id="itemForm" class="mt-4 space-y-3">
         <input type="hidden" id="itemId" />
         <div>
@@ -506,17 +509,21 @@
         if (useLocalStorage) {
           // Local storage mode
           if (itemId.value) {
+            // Edit existing item
             const id = Number(itemId.value);
             const idx = inventory.findIndex(i => i.id === id);
             if (idx !== -1) {
               inventory[idx] = { id, ...payload };
+              setStatus('Item "' + payload.name + '" updated successfully!');
             }
           } else {
+            // Add new item
             const newId = inventory.length > 0 ? Math.max(...inventory.map(i => i.id)) + 1 : 1;
             inventory.push({ id: newId, ...payload });
+            setStatus('Item "' + payload.name + '" added successfully! It now appears in your inventory.');
           }
           saveInventoryToLocal();
-          setStatus(itemId.value ? 'Item updated successfully (local).' : 'Item added successfully (local).');
+          renderInventory();
         } else {
           // Database mode
           let response;
