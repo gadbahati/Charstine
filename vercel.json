@@ -36,8 +36,16 @@
       "dest": "api/server.js"
     },
     {
-      "src": "/(.*)",
+      "src": "/(.*\\.(js|css|gif|jpg|jpeg|png|ico|webp|svg|woff|woff2|ttf|eot))",
       "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.html)",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
