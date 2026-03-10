@@ -395,12 +395,12 @@ app.get('/api/reports', requireAdmin, async (_req, res) => {
   }
 });
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static files from root directory
+app.use(express.static(path.join(__dirname, '..')));
 
 // Fallback for SPA routing
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/index.html'));
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 app.use((err, _req, res, _next) => {
