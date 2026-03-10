@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Dashboard | Charstine Resort</title>
+  <title>Admin Hotel System | Charstine Resort</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
       background:
-        radial-gradient(circle at 12% 10%, rgba(251, 191, 36, 0.14) 0, transparent 32%),
-        radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.14) 0, transparent 36%),
-        radial-gradient(circle at 84% 82%, rgba(14, 165, 233, 0.12) 0, transparent 38%),
-        #020617;
+        radial-gradient(circle at 12% 10%, rgba(251, 191, 36, 0.12) 0, transparent 35%),
+        radial-gradient(circle at 88% 12%, rgba(16, 185, 129, 0.12) 0, transparent 38%),
+        radial-gradient(circle at 84% 82%, rgba(14, 165, 233, 0.1) 0, transparent 40%),
+        linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     }
-    table { table-layout: auto; }
+    table { table-layout: auto; border-collapse: collapse; }
+    thead tr { background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, rgba(251, 191, 36, 0.02) 100%); }
+    tbody tr:hover { background-color: rgba(251, 191, 36, 0.03); transition: background-color 0.2s ease; }
     @media (max-width: 768px) {
       table { font-size: 0.75rem; }
       th, td { padding: 0.5rem 0.25rem; }
@@ -35,24 +37,24 @@
   </style>
 </head>
 <body class="min-h-screen text-slate-100">
-  <header class="border-b border-amber-400/30 bg-slate-900/85 backdrop-blur sticky top-0 z-50">
-    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-3 py-3 sm:px-4 sm:py-4 flex-wrap gap-2">
+      <header class="border-b border-amber-500/40 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 backdrop-blur sticky top-0 z-50 shadow-lg shadow-amber-500/10">
+    <div class="mx-auto flex w-full max-w-7xl items-center justify-between px-3 py-4 sm:px-4 sm:py-5 flex-wrap gap-2">
       <div class="min-w-0 flex-1">
-        <h1 class="text-lg sm:text-2xl font-bold text-amber-300">Admin Inventory & Rentals</h1>
+        <h1 class="text-lg sm:text-3xl font-bold text-amber-300">ADMIN HOTEL SYSTEM</h1>
         <p id="adminEmail" class="truncate text-xs sm:text-sm text-slate-300">Loading...</p>
       </div>
-      <button id="logoutBtn" class="rounded-xl bg-red-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold text-white transition hover:bg-red-400 whitespace-nowrap">Logout</button>
+      <button id="logoutBtn" class="rounded-lg bg-gradient-to-r from-red-600 to-red-500 px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:from-red-700 hover:to-red-600 shadow-lg shadow-red-500/20 whitespace-nowrap">Logout</button>
     </div>
   </header>
 
   <main class="mx-auto grid w-full max-w-7xl gap-4 sm:gap-6 px-3 sm:px-4 py-4 sm:py-6 lg:grid-cols-2">
     <!-- Inventory Section -->
-    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20 lg:col-span-2">
+    <section class="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 p-4 sm:p-6 shadow-2xl shadow-black/40 lg:col-span-2 backdrop-blur-sm">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h2 class="text-lg sm:text-xl font-semibold text-amber-300">Inventory</h2>
         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-          <button id="loadSampleItems" class="flex-1 sm:flex-none rounded-lg bg-green-600 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition hover:bg-green-500">Load Items</button>
-          <button id="refreshInventory" class="flex-1 sm:flex-none rounded-lg bg-slate-700 px-2 sm:px-3 py-2 text-xs sm:text-sm transition hover:bg-slate-600">Refresh</button>
+          <button id="loadSampleItems" class="flex-1 sm:flex-none rounded-lg bg-gradient-to-r from-green-600 to-green-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition hover:from-green-700 hover:to-green-600 shadow-lg shadow-green-500/20">Load Items</button>
+          <button id="refreshInventory" class="flex-1 sm:flex-none rounded-lg bg-gradient-to-r from-slate-700 to-slate-600 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition hover:from-slate-800 hover:to-slate-700 shadow-lg shadow-slate-500/10">Refresh</button>
         </div>
       </div>
       <div class="overflow-x-auto">
@@ -73,7 +75,7 @@
     </section>
 
     <!-- Add Item Section -->
-    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20">
+    <section class="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 p-4 sm:p-6 shadow-2xl shadow-black/40 backdrop-blur-sm">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-2">
         <h2 id="itemFormTitle" class="text-lg sm:text-xl font-semibold text-amber-300">Add Item</h2>
         <span class="text-xs text-slate-400">Fill the form below and click Save Item</span>
@@ -97,20 +99,20 @@
           <textarea id="itemDescription" rows="3" class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs sm:text-sm"></textarea>
         </div>
         <div class="flex flex-col sm:flex-row gap-2">
-          <button type="submit" id="saveItemBtn" class="flex-1 rounded-xl bg-amber-400 px-4 py-2 font-semibold text-slate-950 transition hover:bg-amber-300 disabled:opacity-50 text-xs sm:text-sm">Save Item</button>
-          <button type="button" id="cancelEdit" class="flex-1 rounded-xl bg-slate-700 px-4 py-2 font-semibold transition hover:bg-slate-600 text-xs sm:text-sm">Cancel Edit</button>
+          <button type="submit" id="saveItemBtn" class="flex-1 rounded-lg bg-gradient-to-r from-amber-400 to-amber-300 px-4 py-2.5 font-semibold text-slate-950 transition hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 text-xs sm:text-sm shadow-lg shadow-amber-400/20">Save Item</button>
+          <button type="button" id="cancelEdit" class="flex-1 rounded-lg bg-gradient-to-r from-slate-700 to-slate-600 px-4 py-2.5 font-semibold text-slate-100 transition hover:from-slate-800 hover:to-slate-700 text-xs sm:text-sm shadow-lg shadow-slate-500/10">Cancel Edit</button>
         </div>
       </form>
     </section>
 
     <!-- Rental Logging Section -->
-    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20">
+    <section class="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 p-4 sm:p-6 shadow-2xl shadow-black/40 backdrop-blur-sm">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <div>
           <h2 class="text-lg sm:text-xl font-semibold text-amber-300">Rental Logging</h2>
           <span class="text-xs text-slate-400">Select item, enter quantity, dates, and price - then click Log Rental</span>
         </div>
-        <button id="loadSampleRentals" class="flex-1 sm:flex-none rounded-lg bg-green-600 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition hover:bg-green-500 whitespace-nowrap">Load Sample Rentals</button>
+        <button id="loadSampleRentals" class="flex-1 sm:flex-none rounded-lg bg-gradient-to-r from-green-600 to-green-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold transition hover:from-green-700 hover:to-green-600 shadow-lg shadow-green-500/20 whitespace-nowrap">Load Sample Rentals</button>
       </div>
       <form id="rentalForm" class="mt-4 space-y-3">
         <div>
@@ -137,12 +139,12 @@
           <label class="block text-xs sm:text-sm text-slate-300">Price Paid</label>
           <input id="pricePaid" type="number" min="0" step="0.01" required class="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2 text-xs sm:text-sm" />
         </div>
-        <button type="submit" id="logRentalBtn" class="w-full rounded-xl bg-emerald-500 px-4 py-2 font-semibold text-white transition hover:bg-emerald-400 disabled:opacity-50 text-xs sm:text-sm">Log Rental</button>
+        <button type="submit" id="logRentalBtn" class="w-full rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 font-semibold text-white transition hover:from-emerald-700 hover:to-emerald-600 disabled:opacity-50 text-xs sm:text-sm shadow-lg shadow-emerald-500/20">Log Rental</button>
       </form>
     </section>
 
     <!-- Recent Rentals Section -->
-    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20 lg:col-span-2">
+    <section class="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 p-4 sm:p-6 shadow-2xl shadow-black/40 lg:col-span-2 backdrop-blur-sm">
       <h2 class="text-lg sm:text-xl font-semibold text-amber-300">Recent Rentals</h2>
       <div class="mt-4 overflow-x-auto">
         <table class="w-full border-collapse text-xs sm:text-sm">
@@ -163,7 +165,7 @@
     </section>
 
     <!-- Reports Section -->
-    <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20 lg:col-span-2">
+    <section class="rounded-2xl border border-amber-500/20 bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 p-4 sm:p-6 shadow-2xl shadow-black/40 lg:col-span-2 backdrop-blur-sm">
       <h2 class="text-lg sm:text-xl font-semibold text-amber-300">Reports</h2>
       <div class="mt-4 grid gap-5 md:grid-cols-2">
         <div>
