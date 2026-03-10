@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
       return res.status(401).json({ authenticated: false });
     }
 
-    return res.status(200).json({ authenticated: true, email: 'charstinehoteltourist@gmail.com' });
+    return res.status(200).json({ authenticated: true, email: 'charstinehotelresort@gmail.com' });
   } catch (error) {
     console.error('admin-session error', error);
     return res.status(500).json({ error: 'Session check failed.' });
