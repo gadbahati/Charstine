@@ -89,7 +89,10 @@
 
     <!-- Rental Logging Section -->
     <section class="rounded-2xl border border-slate-800 bg-slate-900/85 p-4 sm:p-5 shadow-xl shadow-black/20">
-      <h2 class="text-lg sm:text-xl font-semibold text-amber-300">Rental Logging</h2>
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+        <h2 class="text-lg sm:text-xl font-semibold text-amber-300">Rental Logging</h2>
+        <button id="loadSampleRentals" class="flex-1 sm:flex-none rounded-lg bg-green-600 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold transition hover:bg-green-500">Load Sample Rentals</button>
+      </div>
       <form id="rentalForm" class="mt-4 space-y-3">
         <div>
           <label class="block text-xs sm:text-sm text-slate-300">Item</label>
@@ -321,6 +324,22 @@
       saveInventoryToLocal();
       renderInventory();
       setStatus('Successfully loaded 57 sample items into your browser!');
+    }
+
+    const SAMPLE_RENTALS = [
+      { id: 1, item_id: 4, item_name: 'Plastic cups', quantity: 50, renter_name: 'John Doe', hire_date: '2026-03-08', return_date: '2026-03-10', price: 500 },
+      { id: 2, item_id: 25, item_name: 'Bowls', quantity: 20, renter_name: 'Jane Smith', hire_date: '2026-03-07', return_date: '2026-03-12', price: 800 },
+      { id: 3, item_id: 43, item_name: 'Spoons', quantity: 100, renter_name: 'Event Planners Ltd', hire_date: '2026-03-06', return_date: '2026-03-09', price: 1200 },
+      { id: 4, item_id: 52, item_name: 'Tea pots', quantity: 5, renter_name: 'Catering Co', hire_date: '2026-03-05', return_date: '2026-03-15', price: 300 },
+      { id: 5, item_id: 2, item_name: 'Plastic plates', quantity: 75, renter_name: 'Wedding Planners', hire_date: '2026-03-04', return_date: '2026-03-08', price: 950 },
+    ];
+
+    function loadSampleRentalsToLocal() {
+      rentals = JSON.parse(JSON.stringify(SAMPLE_RENTALS));
+      saveRentalsToLocal();
+      renderRentals();
+      renderReports();
+      setStatus('Successfully loaded 5 sample rentals into your browser!');
     }
 
     async function loadRentals() {
@@ -611,6 +630,20 @@
         setStatus(error.message, false);
       } finally {
         logRentalBtn.disabled = false;
+      }
+    });
+
+    document.getElementById('loadSampleRentals').addEventListener('click', () => {
+      const btn = document.getElementById('loadSampleRentals');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      try {
+        loadSampleRentalsToLocal();
+      } catch (error) {
+        setStatus('Failed to load sample rentals: ' + error.message, false);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Load Sample Rentals';
       }
     });
 
