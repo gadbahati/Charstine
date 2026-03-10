@@ -1,48 +1,5 @@
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-
-CREATE TABLE IF NOT EXISTS admin_users (
-  id SERIAL PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS items (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  category TEXT NOT NULL,
-  quantity INTEGER NOT NULL CHECK (quantity >= 0),
-  description TEXT DEFAULT ''
-);
-
-CREATE TABLE IF NOT EXISTS rentals (
-  id SERIAL PRIMARY KEY,
-  item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE RESTRICT,
-  quantity INTEGER NOT NULL CHECK (quantity > 0),
-  renter_name TEXT,
-  hire_date DATE NOT NULL,
-  return_date DATE NOT NULL,
-  price NUMERIC(12, 2) NOT NULL CHECK (price >= 0),
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS admin_sessions (
-  id TEXT PRIMARY KEY,
-  admin_id INTEGER NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  expires_at TIMESTAMPTZ NOT NULL
-);
-
-INSERT INTO admin_users (id, email, password_hash)
-VALUES (
-  1,
-  'charstinehotelresort@gmail.com',
-  crypt('Resort254/', gen_salt('bf', 12))
-)
-ON CONFLICT (id) DO UPDATE
-SET email = EXCLUDED.email,
-    password_hash = EXCLUDED.password_hash;
-
-SELECT setval('admin_users_id_seq', (SELECT MAX(id) FROM admin_users));
+-- Seed script for Charstine Hotel Resort inventory items
+-- This script adds all kitchen and restaurant inventory items
 
 INSERT INTO items (id, name, category, quantity, description) VALUES
   -- Kitchen Inventory Items
@@ -107,4 +64,5 @@ INSERT INTO items (id, name, category, quantity, description) VALUES
   (57, 'Kamata', 'Restaurant Inventory', 1, 'Food handling utensil')
 ON CONFLICT (id) DO NOTHING;
 
+-- Update the sequence to the highest ID
 SELECT setval('items_id_seq', (SELECT MAX(id) FROM items));
