@@ -17,7 +17,8 @@
     thead tr { background: linear-gradient(90deg, rgba(251, 191, 36, 0.05) 0%, rgba(251, 191, 36, 0.02) 100%); }
     tbody tr:hover { background-color: rgba(251, 191, 36, 0.03); transition: background-color 0.2s ease; }
     @media (max-width: 768px) {
-      table { font-size: 0.75rem; }
+      table { font-size: 0.75rem; min-width: 600px; }
+      .overflow-x-auto { -webkit-overflow-scrolling: touch; }
       th, td { padding: 0.5rem 0.25rem; }
       button { padding: 0.5rem 0.75rem; font-size: 0.75rem; }
       input, select, textarea { font-size: 16px; }
@@ -243,6 +244,7 @@
     }
 
     async function loadInventory() {
+      inventoryTable.innerHTML = '<tr><td colspan="6" class="py-4 text-slate-400 text-center italic">Loading inventory...</td></tr>';
       try {
         const response = await fetch('/api/inventory');
         if (!response.ok) throw new Error('Failed to load inventory from database');
@@ -364,6 +366,7 @@
     }
 
     async function loadRentals() {
+      rentalTable.innerHTML = '<tr><td colspan="7" class="py-4 text-slate-400 text-center italic">Loading rentals...</td></tr>';
       try {
         const response = await fetch('/api/rentals');
         if (!response.ok) throw new Error('Failed to load rentals from database');
@@ -404,8 +407,11 @@
         return;
       }
 
-      inventoryTable.innerHTML = inventory.map((item) => `
-        <tr class="border-b border-slate-800">
+      const fragment = document.createDocumentFragment();
+      inventory.forEach((item) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800';
+        tr.innerHTML = `
           <td class="py-2 px-1 sm:px-2">${item.id}</td>
           <td class="py-2 px-1 sm:px-2">${item.name}</td>
           <td class="py-2 px-1 sm:px-2">${item.category}</td>
@@ -417,13 +423,17 @@
               <button data-action="delete" data-id="${item.id}" class="flex-1 sm:flex-none rounded bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-red-500 transition">Delete</button>
             </div>
           </td>
-        </tr>
-      `).join('');
+        `;
+        fragment.appendChild(tr);
+      });
+      inventoryTable.innerHTML = '';
+      inventoryTable.appendChild(fragment);
 
-      rentalItemSelect.innerHTML = inventory
+      const options = inventory
         .filter((item) => item.quantity > 0)
         .map((item) => `<option value="${item.id}">${item.name} (${item.quantity} available)</option>`)
         .join('');
+      rentalItemSelect.innerHTML = '<option value="">-- Select Item --</option>' + options;
     }
 
     function renderRentals() {
@@ -433,8 +443,11 @@
       }
 
       const sortedRentals = [...rentals].sort((a, b) => new Date(b.hire_date) - new Date(a.hire_date) || b.id - a.id);
-      rentalTable.innerHTML = sortedRentals.map((rental) => `
-        <tr class="border-b border-slate-800">
+      const fragment = document.createDocumentFragment();
+      sortedRentals.forEach((rental) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-slate-800';
+        tr.innerHTML = `
           <td class="py-2 px-1 sm:px-2">${rental.id}</td>
           <td class="py-2 px-1 sm:px-2">${rental.item_name || 'Unknown Item'}</td>
           <td class="py-2 px-1 sm:px-2">${rental.quantity}</td>
@@ -442,8 +455,11 @@
           <td class="py-2 px-1 sm:px-2">${rental.hire_date}</td>
           <td class="py-2 px-1 sm:px-2">${rental.return_date}</td>
           <td class="py-2 px-1 sm:px-2">${Number(rental.price).toFixed(2)}</td>
-        </tr>
-      `).join('');
+        `;
+        fragment.appendChild(tr);
+      });
+      rentalTable.innerHTML = '';
+      rentalTable.appendChild(fragment);
     }
 
     function renderReports() {
@@ -582,7 +598,10 @@
         itemQuantity.value = selectedItem.quantity;
         itemDescription.value = selectedItem.description || '';
         itemFormTitle.textContent = `Edit Item #${selectedItem.id}`;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Use a slight delay to prevent layout shaking on some mobile browsers
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 10);
       }
 
       if (action === 'delete') {
