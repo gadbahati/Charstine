@@ -8,13 +8,19 @@ class AffiliateManager:
             "default": "https://amazon.com/best-sellers?tag="
         }
 
-    def inject_links(self, content, niche_category="default"):
+    def inject_links(self, content, platform="default", niche_category="default"):
         base_link = self.product_links.get(niche_category, self.product_links["default"])
         full_link = f"{base_link}{self.affiliate_id}"
         
-        # Simple injection at the end of content
         disclaimer = "\n\n*Disclosure: This post contains affiliate links. I may earn a commission at no extra cost to you.*"
-        cta = f"\n\nCheck out our top recommendation for this niche: {full_link}"
+        
+        if platform == "tiktok" or platform == "youtube_shorts":
+            # For short-form video, we usually refer to the Link-in-Bio
+            cta = f"\n\n🔗 Get the tools mentioned here: Link in Bio! ({full_link})"
+        elif platform == "facebook":
+            cta = f"\n\n👉 Check this out: {full_link}"
+        else:
+            cta = f"\n\nCheck out our top recommendation for this niche: {full_link}"
         
         return content + cta + disclaimer
 

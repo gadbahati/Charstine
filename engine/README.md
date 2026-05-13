@@ -5,8 +5,8 @@ This is an autonomous system designed to operate with $0 initial capital, resear
 ## Architecture
 
 1.  **Research Module (`research/niche_finder.py`)**: Uses Google Trends and Reddit RSS/JSON feeds to identify daily trending topics in the Productivity and Tech sectors.
-2.  **Content Factory (`factory/content_generator.py`)**: Integrates with the Gemini-2.5-flash API (via the OpenAI-compatible client) to generate platform-specific content (Pinterest, YouTube Shorts, Medium).
-3.  **Distribution Engine (`distribution/publisher.py`)**: Simulates automated posting to social platforms with human-like delays to avoid spam filters.
+2.  **Content Factory (`factory/content_generator.py`)**: Integrates with the Gemini-2.5-flash API to generate platform-specific content (Pinterest, YouTube Shorts, Medium, TikTok, Facebook).
+3.  **Distribution Engine (`distribution/publisher.py`)**: Simulates automated posting to all five social platforms with human-like delays and saved browser sessions to avoid spam filters.
 4.  **Financial Routing (`routing/affiliate_manager.py`)**: Injects affiliate IDs into content metadata and provides a structure for monitoring performance.
 5.  **Self-Optimization (`optimization/feedback_loop.py`)**: Analyzes performance data (simulated for now) to double down on high-performing niches in subsequent cycles.
 6.  **Orchestrator (`main.py`)**: Coordinates the entire workflow.

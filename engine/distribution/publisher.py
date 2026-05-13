@@ -24,6 +24,16 @@ class Publisher:
         time.sleep(random.randint(5, 10))
         return True
 
+    def publish_to_tiktok(self, script):
+        print(f"Publishing to TikTok: {script[:50]}...")
+        time.sleep(random.randint(10, 20))
+        return True
+
+    def publish_to_facebook(self, content):
+        print(f"Publishing to Facebook: {content[:50]}...")
+        time.sleep(random.randint(5, 15))
+        return True
+
     def distribute_all(self, content_package):
         results = {}
         if content_package.get('pinterest'):
@@ -32,4 +42,8 @@ class Publisher:
             results['youtube_shorts'] = self.publish_to_youtube(content_package['youtube_shorts'])
         if content_package.get('medium'):
             results['medium'] = self.publish_to_medium(content_package['medium'])
+        if content_package.get('tiktok'):
+            results['tiktok'] = self.publish_to_tiktok(content_package['tiktok'])
+        if content_package.get('facebook'):
+            results['facebook'] = self.publish_to_facebook(content_package['facebook'])
         return results

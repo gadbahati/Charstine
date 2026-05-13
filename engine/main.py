@@ -43,7 +43,7 @@ def run_cycle():
     print("Step 3: Injecting affiliate links...")
     for platform in content_package:
         if content_package[platform]:
-            content_package[platform] = affiliate.inject_links(content_package[platform], niche_category="productivity")
+            content_package[platform] = affiliate.inject_links(content_package[platform], platform=platform, niche_category="productivity")
 
     # 5. Distribution
     print("Step 4: Distributing content...")

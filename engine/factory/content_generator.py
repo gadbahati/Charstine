@@ -11,7 +11,9 @@ class ContentFactory:
         prompts = {
             "pinterest": f"Generate a catchy Pinterest Pin title and description for the topic: {niche_topic}. Focus on productivity or tech hacks.",
             "youtube_shorts": f"Write a 50-second high-retention script for a YouTube Short about: {niche_topic}. Include a hook, 3 quick tips, and a call to action.",
-            "medium": f"Write a professional, long-form educational article (800 words) about: {niche_topic}. Use a structured format with headings and a conclusion."
+            "medium": f"Write a professional, long-form educational article (800 words) about: {niche_topic}. Use a structured format with headings and a conclusion.",
+            "tiktok": f"Write a viral-style 30-second TikTok script about: {niche_topic}. Start with a strong hook, use high-energy language, and end with a trend-based CTA.",
+            "facebook": f"Write an engaging Facebook post about: {niche_topic}. Include emojis, ask a question to encourage comments, and provide a helpful tip."
         }
         
         generated_content = {}
